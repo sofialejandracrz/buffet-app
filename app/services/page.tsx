@@ -134,7 +134,7 @@ export default function ServicesPage() {
             {services.map((service, index) => (
               <Card
                 key={index}
-                className={`border-0 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 dark:bg-gray-800 ${service.popular ? "ring-2 ring-blue-500 dark:ring-blue-400" : ""}`}
+                className={`border-0 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 dark:bg-gray-800 dark:shadow-gray-700 ${service.popular ? "ring-2 ring-blue-500 dark:ring-blue-400" : ""}`}
               >
                 {service.popular && (
                   <div className="bg-blue-500 text-white text-center py-2 text-sm font-medium rounded-t-lg">
@@ -143,9 +143,8 @@ export default function ServicesPage() {
                 )}
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                      <service.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                    </div>
+                    
+                    <CardTitle className="text-2xl text-gray-900 dark:text-white">{service.title}</CardTitle>
                     <Badge
                       variant="outline"
                       className="text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400"
@@ -153,7 +152,6 @@ export default function ServicesPage() {
                       {service.price}
                     </Badge>
                   </div>
-                  <CardTitle className="text-2xl text-gray-900 dark:text-white">{service.title}</CardTitle>
                   <p className="text-gray-600 dark:text-gray-300">{service.description}</p>
                 </CardHeader>
                 <CardContent>
@@ -166,7 +164,7 @@ export default function ServicesPage() {
                     ))}
                   </ul>
                   <div className="flex space-x-3">
-                    <Button asChild className="flex-1 bg-blue-600 hover:bg-blue-700">
+                    <Button asChild className="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white">
                       <Link href="/contact">
                         Consultar
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -265,7 +263,7 @@ export default function ServicesPage() {
                   "Traiga todos los documentos relevantes a su caso, como contratos, correspondencia, documentos legales previos y cualquier evidencia relacionada.",
               },
             ].map((faq, index) => (
-              <Card key={index} className="border-0 shadow-lg dark:bg-gray-800">
+              <Card key={index} className="border-0 shadow-lg hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-700 transition-all hover:-translate-y-1">
                 <CardContent className="p-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{faq.question}</h3>
                   <p className="text-gray-600 dark:text-gray-300">{faq.answer}</p>
@@ -291,7 +289,7 @@ export default function ServicesPage() {
               asChild
               size="lg"
               variant="outline"
-              className="border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
+              className="border-white text-white hover:bg-white hover:text-blue-600 dark:border-white dark:hover:bg-white bg-transparent"
             >
               <Link href="tel:+1234567890">Llamar Ahora</Link>
             </Button>

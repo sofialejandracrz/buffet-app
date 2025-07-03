@@ -198,16 +198,16 @@ export default function ContactPage() {
                     <div className="flex items-center space-x-3">
                       <Phone className="h-5 w-5 text-blue-600 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-gray-900">Teléfono</p>
-                        <p className="text-gray-600">(555) 123-4567</p>
+                        <p className="font-medium text-gray-900 dark:text-white">Teléfono</p>
+                        <p className="text-gray-600 dark:text-gray-300">(555) 123-4567</p>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-3">
                       <Mail className="h-5 w-5 text-blue-600 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-gray-900">Email</p>
-                        <p className="text-gray-600">info@lexfirm.com</p>
+                        <p className="font-medium text-gray-900 dark:text-white">Email</p>
+                        <p className="text-gray-600 dark:text-gray-300">info@lexfirm.com</p>
                       </div>
                     </div>
                   </div>
@@ -219,19 +219,19 @@ export default function ContactPage() {
                 <CardContent className="p-6">
                   <div className="flex items-center space-x-2 mb-4">
                     <Clock className="h-5 w-5 text-blue-600" />
-                    <h3 className="text-xl font-semibold text-gray-900">Horarios de Atención</h3>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Horarios de Atención</h3>
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Lunes - Viernes</span>
+                      <span className="text-gray-600 dark:text-gray-300">Lunes - Viernes</span>
                       <span className="font-medium">8:00 AM - 6:00 PM</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Sábados</span>
+                      <span className="text-gray-600 dark:text-gray-300">Sábados</span>
                       <span className="font-medium">9:00 AM - 2:00 PM</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Domingos</span>
+                      <span className="text-gray-600 dark:text-gray-300">Domingos</span>
                       <span className="font-medium">Cerrado</span>
                     </div>
                   </div>

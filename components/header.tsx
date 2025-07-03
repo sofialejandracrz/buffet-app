@@ -33,7 +33,7 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-muted-foreground hover:text-primary font-medium transition-colors"
+                className="text-muted-foreground hover:text-blue-400 dark:hover:text-blue-500 font-medium transition-colors"
               >
                 {item.name}
               </Link>
@@ -48,7 +48,7 @@ export default function Header() {
             <ThemeToggle />
             <Button
               asChild
-              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-white"
             >
               <Link href="/contact">Consulta Gratuita</Link>
             </Button>
@@ -91,7 +91,7 @@ export default function Header() {
                     </div>
                     <Button
                       asChild
-                      className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+                      className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white"
                     >
                       <Link href="/contact" onClick={() => setIsOpen(false)}>
                         Consulta Gratuita
