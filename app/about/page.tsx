@@ -1,3 +1,4 @@
+'use client'
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -5,64 +6,20 @@ import { Award, Users, Target, Heart, Linkedin, Mail } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import Link from "next/link"
+import { useEffect, useState } from "react"
+import api from "@/lib/axios"
 
 export default function AboutPage() {
-  const teamMembers = [
-    {
-      name: "Dr. María Elena Rodríguez",
-      position: "Socia Fundadora",
-      specialization: "Derecho Corporativo",
-      experience: "25 años",
-      education: "Harvard Law School",
-      image: "/placeholder.svg?height=300&width=300",
-      bio: "Especialista en derecho corporativo con amplia experiencia en fusiones y adquisiciones.",
-    },
-    {
-      name: "Lic. Carlos Mendoza",
-      position: "Socio Senior",
-      specialization: "Litigios Civiles",
-      experience: "20 años",
-      education: "Universidad de Stanford",
-      image: "/placeholder.svg?height=300&width=300",
-      bio: "Experto litigante con un historial excepcional en casos civiles complejos.",
-    },
-    {
-      name: "Dra. Ana Sofía López",
-      position: "Socia",
-      specialization: "Derecho de Familia",
-      experience: "15 años",
-      education: "Yale Law School",
-      image: "/placeholder.svg?height=300&width=300",
-      bio: "Especializada en derecho de familia con enfoque en mediación y resolución pacífica.",
-    },
-    {
-      name: "Lic. Roberto Jiménez",
-      position: "Asociado Senior",
-      specialization: "Derecho Laboral",
-      experience: "12 años",
-      education: "Universidad de Columbia",
-      image: "/placeholder.svg?height=300&width=300",
-      bio: "Defensor de los derechos laborales con experiencia en negociación colectiva.",
-    },
-    {
-      name: "Dra. Patricia Herrera",
-      position: "Asociada",
-      specialization: "Derecho Penal",
-      experience: "8 años",
-      education: "Universidad de Chicago",
-      image: "/placeholder.svg?height=300&width=300",
-      bio: "Abogada penalista comprometida con la defensa de los derechos constitucionales.",
-    },
-    {
-      name: "Lic. Fernando Castro",
-      position: "Asociado",
-      specialization: "Derecho Inmobiliario",
-      experience: "10 años",
-      education: "Universidad de Georgetown",
-      image: "/placeholder.svg?height=300&width=300",
-      bio: "Experto en transacciones inmobiliarias y desarrollo de proyectos comerciales.",
-    },
-  ]
+  const [teamMembers, setTeamMembers] = useState<any[]>([])
+  useEffect(() => {
+    api.get("/api/Empleado")
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data : [res.data]
+        setTeamMembers(data)
+        console.log("Team members loaded:", data)
+      })
+      .catch(() => setTeamMembers([]))
+  }, [])
 
   return (
     <div className="min-h-screen bg-background">
@@ -129,7 +86,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="border-0 shadow-lg text-center dark:bg-gray-800">
+            <Card className="border-0 shadow-lg text-center dark:bg-gray-800 dark:shadow-gray-700">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -142,7 +99,7 @@ export default function AboutPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg text-center dark:bg-gray-800">
+            <Card className="border-0 shadow-lg text-center dark:bg-gray-800 dark:shadow-gray-700">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Heart className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -154,7 +111,7 @@ export default function AboutPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg text-center dark:bg-gray-800">
+            <Card className="border-0 shadow-lg text-center dark:bg-gray-800 dark:shadow-gray-700">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Award className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -166,7 +123,7 @@ export default function AboutPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg text-center dark:bg-gray-800">
+            <Card className="border-0 shadow-lg text-center dark:bg-gray-800 dark:shadow-gray-700">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -193,31 +150,35 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {teamMembers.map((member, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow dark:bg-gray-800">
+              <Card key={index} className="border-0 shadow-lg hover:shadow-xl dark:shadow-gray-700 dark:bg-gray-800 transition-all hover:-translate-y-1">
                 <CardContent className="p-0">
                   <div className="relative">
                     <img
-                      src={member.image || "/placeholder.svg"}
-                      alt={member.name}
+                      src={member.Imagen || "/placeholder.svg"}
+                      alt={member.Nombre + " " + member.Apellido}
                       className="w-full h-64 object-cover rounded-t-lg"
                     />
                     <div className="absolute top-4 right-4">
-                      <Badge className="bg-blue-600 dark:bg-blue-700">{member.experience}</Badge>
+                      <Badge className="bg-blue-600 dark:bg-blue-700 dark:text-white">{member.Experiencia}</Badge>
                     </div>
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">{member.name}</h3>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">{member.position}</p>
-                    <p className="text-gray-600 dark:text-gray-300 mb-3">{member.specialization}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{member.education}</p>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{member.bio}</p>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">{member.Nombre + " " + member.Apellido}</h3>
+                    <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">{member.Cargo}</p>
+                    <p className="text-gray-600 dark:text-gray-300 mb-3">{member.Especializacion}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{member.Educacion}</p>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{member.Biografia}</p>
                     <div className="flex space-x-2">
                       <Button size="sm" variant="outline" className="flex-1 bg-transparent">
-                        <Mail className="h-4 w-4 mr-2" />
-                        Contactar
+                        <Link href={`mailto:${member.Correo}`} passHref className="flex items-center justify-center w-full">
+                          <Mail className="h-4 w-4 mr-2" />
+                          Contactar
+                        </Link>
                       </Button>
-                      <Button size="sm" variant="outline">
-                        <Linkedin className="h-4 w-4" />
+                      <Button size="sm" variant="outline" asChild>
+                        <a href={member.LinkedinUrl || "#"} target="_blank" rel="noopener noreferrer">
+                          <Linkedin className="h-4 w-4" />
+                        </a>
                       </Button>
                     </div>
                   </div>
@@ -245,3 +206,4 @@ export default function AboutPage() {
     </div>
   )
 }
+

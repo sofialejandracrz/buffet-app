@@ -17,13 +17,13 @@ export default function Footer() {
               personalizadas.
             </p>
             <div className="flex space-x-4">
-              <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <Link href="#" aria-label="Nuestro Facebook" className="text-gray-400 hover:text-blue-400 transition-colors dark:hover:text-blue-500">
                 <Facebook className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <Link href="#" aria-label="Nuestro Twitter" className="text-gray-400 hover:text-blue-400 transition-colors dark:hover:text-blue-500">
                 <Twitter className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <Link href="#" aria-label="Nuestro LinkedIn" className="text-gray-400 hover:text-blue-400 transition-colors dark:hover:text-blue-500">
                 <Linkedin className="h-5 w-5" />
               </Link>
             </div>
@@ -34,27 +34,27 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
+                <Link href="/" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
                   Inicio
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
+                <Link href="/about" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
                   Sobre Nosotros
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
+                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
                   Servicios
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
+                <Link href="/blog" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
+                <Link href="/contact" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
                   Contacto
                 </Link>
               </li>
@@ -66,27 +66,27 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Servicios</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
+                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
                   Derecho Corporativo
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
+                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
                   Derecho de Familia
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
+                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
                   Litigios Civiles
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
+                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
                   Derecho Laboral
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
+                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
                   Derecho Penal
                 </Link>
               </li>

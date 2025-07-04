@@ -28,14 +28,14 @@ export default function HomePage() {
               personalizado y resultados excepcionales.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-white text-lg px-8 py-3">
                 <Link href="/contact">Consulta Gratuita</Link>
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-slate-900 text-lg px-8 py-3 bg-transparent"
+                className="border-gray-400 text-white hover:bg-white hover:border-white hover:text-slate-900 dark:border-slate-600 dark:hover:bg-slate-600 text-lg px-8 py-3 bg-transparent"
               >
                 <Link href="/services">Nuestros Servicios</Link>
               </Button>
@@ -81,7 +81,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow dark:bg-gray-800">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow dark:bg-gray-800 dark:shadow-gray-700">
               <CardContent className="p-8 text-center">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Scale className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -94,7 +94,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow dark:bg-gray-800">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow dark:bg-gray-800 dark:shadow-gray-700">
               <CardContent className="p-8 text-center">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -107,7 +107,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow dark:bg-gray-800">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow dark:bg-gray-800 dark:shadow-gray-700">
               <CardContent className="p-8 text-center">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Award className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -168,7 +168,7 @@ export default function HomePage() {
             ].map((service, index) => (
               <Card
                 key={index}
-                className="border-0 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 dark:bg-gray-800"
+                className="border-0 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 dark:bg-gray-800 dark:shadow-gray-700"
               >
                 <CardContent className="p-6">
                   <service.icon className="h-12 w-12 text-blue-600 dark:text-blue-400 mb-4" />
@@ -186,7 +186,7 @@ export default function HomePage() {
           </div>
 
           <div className="text-center mt-12">
-            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
+            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-white">
               <Link href="/services">Ver Todos los Servicios</Link>
             </Button>
           </div>
@@ -226,7 +226,7 @@ export default function HomePage() {
                 rating: 5,
               },
             ].map((testimonial, index) => (
-              <Card key={index} className="border-0 shadow-lg dark:bg-gray-800">
+              <Card key={index} className="border-0 shadow-lg dark:bg-gray-800 dark:shadow-gray-700 hover:shadow-xl transition-all hover:-translate-y-1">
                 <CardContent className="p-6">
                   <div className="flex mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
@@ -260,7 +260,7 @@ export default function HomePage() {
               asChild
               size="lg"
               variant="outline"
-              className="border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
+               className="border-white text-white hover:bg-white hover:text-blue-600 dark:border-white dark:hover:bg-white bg-transparent"
             >
               <Link href="tel:+1234567890">Llamar Ahora</Link>
             </Button>

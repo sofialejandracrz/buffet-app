@@ -121,7 +121,7 @@ export default function BlogPage() {
                   key={index}
                   variant={index === 0 ? "default" : "outline"}
                   size="sm"
-                  className={index === 0 ? "bg-blue-600 hover:bg-blue-700" : ""}
+                  className={index === 0 ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}
                 >
                   {category}
                 </Button>
@@ -136,11 +136,11 @@ export default function BlogPage() {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="mb-8">
-              <Badge className="bg-blue-600 dark:bg-blue-700 mb-4">Artículo Destacado</Badge>
+              <Badge className="bg-blue-600 dark:bg-blue-700 text-white mb-4">Artículo Destacado</Badge>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Lo Más Reciente</h2>
             </div>
 
-            <Card className="border-0 shadow-xl overflow-hidden dark:bg-gray-800">
+            <Card className="border-0 shadow-xl overflow-hidden dark:bg-gray-800 dark:shadow-gray-700 hover:shadow-lg transition-all hover:-translate-y-1">
               <div className="grid lg:grid-cols-2 gap-0">
                 <div className="relative h-64 lg:h-auto">
                   <img
@@ -149,7 +149,7 @@ export default function BlogPage() {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-4 left-4">
-                    <Badge className="bg-blue-600">{featuredPost.category}</Badge>
+                    <Badge className="bg-blue-600 text-white">{featuredPost.category}</Badge>
                   </div>
                 </div>
                 <CardContent className="p-8 flex flex-col justify-center">
@@ -169,7 +169,7 @@ export default function BlogPage() {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{featuredPost.title}</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{featuredPost.excerpt}</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-fit">
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-fit text-white">
                     Leer Artículo Completo
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -192,12 +192,12 @@ export default function BlogPage() {
             {regularPosts.map((post) => (
               <Card
                 key={post.id}
-                className="border-0 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden dark:bg-gray-800"
+                className="border-0 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden dark:bg-gray-800 dark:shadow-gray-700"
               >
                 <div className="relative">
                   <img src={post.image || "/placeholder.svg"} alt={post.title} className="w-full h-48 object-cover" />
                   <div className="absolute top-4 left-4">
-                    <Badge className="bg-blue-600">{post.category}</Badge>
+                    <Badge className="bg-blue-600 text-white">{post.category}</Badge>
                   </div>
                 </div>
                 <CardContent className="p-6">
@@ -220,7 +220,7 @@ export default function BlogPage() {
                       <User className="h-4 w-4 text-gray-400" />
                       <span className="text-sm text-gray-500 dark:text-gray-400">{post.author}</span>
                     </div>
-                    <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+                    <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 dark:hover:text-white">
                       Leer más
                       <ArrowRight className="ml-1 h-3 w-3" />
                     </Button>
