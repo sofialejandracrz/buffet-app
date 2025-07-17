@@ -1,3 +1,4 @@
+'use client'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -17,95 +18,29 @@ import {
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import Link from "next/link"
+import { ServiceSkeleton, ServiceCard } from "@/components/ui/service-skeleton"
+import useServicesData from "@/hooks/useServicesData"
 
 export default function ServicesPage() {
-  const services = [
-    {
-      icon: Building2,
-      title: "Derecho Corporativo",
-      description: "Asesoría integral para empresas de todos los tamaños",
-      features: [
-        "Constitución de sociedades",
-        "Contratos comerciales",
-        "Fusiones y adquisiciones",
-        "Gobierno corporativo",
-        "Compliance empresarial",
-        "Reestructuraciones",
-      ],
-      price: "Desde $500/hora",
-      popular: true,
-    },
-    {
-      icon: Heart,
-      title: "Derecho de Familia",
-      description: "Soluciones sensibles para asuntos familiares",
-      features: [
-        "Divorcios y separaciones",
-        "Custodia de menores",
-        "Pensión alimenticia",
-        "Adopciones",
-        "Mediación familiar",
-        "Acuerdos prenupciales",
-      ],
-      price: "Desde $300/hora",
-    },
-    {
-      icon: Gavel,
-      title: "Litigios Civiles",
-      description: "Representación experta en disputas civiles",
-      features: [
-        "Disputas contractuales",
-        "Responsabilidad civil",
-        "Daños y perjuicios",
-        "Disputas comerciales",
-        "Mediación y arbitraje",
-        "Apelaciones",
-      ],
-      price: "Desde $400/hora",
-    },
-    {
-      icon: Briefcase,
-      title: "Derecho Laboral",
-      description: "Protección de derechos laborales",
-      features: [
-        "Despidos injustificados",
-        "Discriminación laboral",
-        "Acoso en el trabajo",
-        "Negociación colectiva",
-        "Contratos laborales",
-        "Seguridad social",
-      ],
-      price: "Desde $350/hora",
-    },
-    {
-      icon: Shield,
-      title: "Derecho Penal",
-      description: "Defensa criminal especializada",
-      features: [
-        "Delitos económicos",
-        "Defensa penal",
-        "Delitos contra la propiedad",
-        "Violencia doméstica",
-        "Tráfico de drogas",
-        "Apelaciones penales",
-      ],
-      price: "Desde $450/hora",
-    },
-    {
-      icon: Home,
-      title: "Derecho Inmobiliario",
-      description: "Transacciones y disputas inmobiliarias",
-      features: [
-        "Compraventa de propiedades",
-        "Arrendamientos",
-        "Desarrollo inmobiliario",
-        "Disputas de propiedad",
-        "Zonificación",
-        "Títulos de propiedad",
-      ],
-      price: "Desde $300/hora",
-    },
-  ]
+  const { services, isLoading } = useServicesData()
+
+  // Mapeo de iconos string a componentes
+  const iconMap: { [key: string]: any } = {
+    Building2,
+    Heart,
+    Gavel,
+    Briefcase,
+    Shield,
+    Home,
+    Scale,
+    Award,
+    Clock
+  }
+
+  // Función para obtener el componente de icono
+  const getIconComponent = (iconName: string) => {
+    return iconMap[iconName] || Scale
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -130,54 +65,19 @@ export default function ServicesPage() {
       {/* Services Grid */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-8">
-            {services.map((service, index) => (
-              <Card
-                key={index}
-                className={`border-0 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 dark:bg-gray-800 dark:shadow-gray-700 ${service.popular ? "ring-2 ring-blue-500 dark:ring-blue-400" : ""}`}
-              >
-                {service.popular && (
-                  <div className="bg-blue-500 text-white text-center py-2 text-sm font-medium rounded-t-lg">
-                    Más Popular
-                  </div>
-                )}
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between mb-4">
-                    
-                    <CardTitle className="text-2xl text-gray-900 dark:text-white">{service.title}</CardTitle>
-                    <Badge
-                      variant="outline"
-                      className="text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400"
-                    >
-                      {service.price}
-                    </Badge>
-                  </div>
-                  <p className="text-gray-600 dark:text-gray-300">{service.description}</p>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 mb-6">
-                    {service.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                        <span className="text-gray-600 dark:text-gray-300">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex space-x-3">
-                    <Button asChild className="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white">
-                      <Link href="/contact">
-                        Consultar
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <Button variant="outline" className="flex-1 bg-transparent">
-                      Más Info
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {isLoading ? (
+            <ServiceSkeleton count={6} />
+          ) : (
+            <div className="grid lg:grid-cols-2 gap-8">
+              {services.map((service) => (
+                <ServiceCard
+                  key={service.Id}
+                  service={service}
+                  iconComponent={getIconComponent(service.Icono)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
