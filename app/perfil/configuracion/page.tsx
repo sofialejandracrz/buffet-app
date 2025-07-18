@@ -146,7 +146,7 @@ export default function ConfiguracionPage() {
       toast.success("Perfil actualizado", {
         description: "Tu información personal ha sido actualizada correctamente.",
       })
-    } catch (error) {
+    } catch {
       toast.error("Error", {
         description: "No se pudo actualizar el perfil. Inténtalo de nuevo.",
       })
@@ -179,7 +179,7 @@ export default function ConfiguracionPage() {
         newPassword: "",
         confirmPassword: "",
       })
-    } catch (error) {
+    } catch {
       toast.error("Error", {
         description: "No se pudo cambiar la contraseña. Verifica que la contraseña actual sea correcta.",
       })

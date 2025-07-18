@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Download, Upload, Search, Filter, FolderOpen, File, Plus, Eye, Trash2, Share } from "lucide-react";
+import { FileText, Download, Upload, Search, Filter, FolderOpen, Plus, Eye, Trash2, Share } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 
 interface Document {
   id: string;
@@ -156,7 +155,6 @@ export default function DocumentosPage() {
   const [folders] = useState<DocumentFolder[]>(mockFolders);
   const [filterType, setFilterType] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
   const filteredDocuments = documents.filter(doc => {
     const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

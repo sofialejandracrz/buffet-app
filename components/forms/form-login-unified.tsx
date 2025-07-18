@@ -21,7 +21,6 @@ interface LoginResponse {
     refreshToken: string;
     user: {
       id: string;
-      nombre: string;
       correo: string;
       rol: string;
     };
@@ -86,9 +85,13 @@ export function UnifiedLoginForm({
       } else {
         alert(response.data.message || "Error al iniciar sesión");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error de login:", error);
-      const errorMessage = error.response?.data?.message || "Credenciales incorrectas";
+      let errorMessage = "Credenciales incorrectas";
+      if (typeof error === "object" && error !== null && "response" in error) {
+        const err = error as { response?: { data?: { message?: string } } };
+        errorMessage = err.response?.data?.message || errorMessage;
+      }
       alert(errorMessage);
     } finally {
       setLoading(false);

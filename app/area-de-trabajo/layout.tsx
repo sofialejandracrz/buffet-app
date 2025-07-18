@@ -1,10 +1,7 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { redirect } from "next/navigation";
-import { useEffect } from "react";
 
 export default function AreaDeTrabajoLayout({
   children,

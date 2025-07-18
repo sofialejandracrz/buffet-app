@@ -55,8 +55,12 @@ export function RegisterFormCliente({
       } else {
         alert(response.data.message || "Error en el registro");
       }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Error en el registro";
+    } catch (error: unknown) {
+      let errorMessage = "Error en el registro";
+      if (typeof error === "object" && error !== null && "response" in error) {
+        const err = error as { response?: { data?: { message?: string } } };
+        errorMessage = err.response?.data?.message || errorMessage;
+      }
       alert(errorMessage);
     } finally {
       setLoading(false);

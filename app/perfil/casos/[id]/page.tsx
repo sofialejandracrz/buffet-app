@@ -521,7 +521,7 @@ export default function CaseDetailPage() {
                 <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border"></div>
 
                 <div className="space-y-6">
-                  {caseData.timeline.map((event, index) => {
+                  {caseData.timeline.map((event) => {
                     const Icon = event.icon
                     const datetime = formatDateTime(event.date, event.time)
 

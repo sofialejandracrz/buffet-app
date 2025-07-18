@@ -55,7 +55,7 @@ interface ServiceCardProps {
     EsPopular: boolean
     Caracteristicas: Array<{ nombre: string }>
   }
-  iconComponent: React.ComponentType<any>
+  iconComponent: React.ComponentType<{ className?: string }>
 }
 
 export function ServiceCard({ service, iconComponent: IconComponent }: ServiceCardProps) {

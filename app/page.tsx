@@ -9,11 +9,11 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { StarsBackground } from "@/components/animate-ui/backgrounds/stars"
 import { GradientText } from "@/components/animate-ui/text/gradient"
-import { StatsSkeleton, ServiceSkeleton, TestimonialSkeleton } from "@/components/ui/loading"
+import { StatsSkeleton } from "@/components/ui/loading"
 import useHomeData from "@/hooks/useHomeData"
 
 // Mapeo de iconos string a componentes
-const iconMap: { [key: string]: any } = {
+const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
   Building2,
   Heart,
   Gavel,
@@ -26,7 +26,7 @@ const iconMap: { [key: string]: any } = {
 }
 
 export default function HomePage() {
-  const { homeData, isLoading, error } = useHomeData()
+  const { homeData, isLoading } = useHomeData()
 
   // Usar datos de la API si están disponibles, sino usar fallback del hook
   const stats = homeData?.Stats || { CasosExitosos: 0, AñosExperiencia: 0, AbogadosExpertos: 0, SatisfaccionCliente: 0 }
