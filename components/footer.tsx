@@ -90,6 +90,11 @@ export default function Footer() {
                   Derecho Penal
                 </Link>
               </li>
+              <li>
+                <Link href="/services" className="text-gray-300 dark:text-gray-400 hover:text-blue-400 dark:hover:text-blue-500 transition-colors">
+                  Derecho Penal
+                </Link>
+              </li>
             </ul>
           </div>
 

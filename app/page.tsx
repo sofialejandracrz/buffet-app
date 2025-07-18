@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -5,23 +7,64 @@ import { Badge } from "@/components/ui/badge"
 import { Scale, Users, Award, ArrowRight, Star, Building2, Heart, Gavel, Briefcase, Shield, Home } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { StarsBackground } from "@/components/animate-ui/backgrounds/stars"
+import { GradientText } from "@/components/animate-ui/text/gradient"
+import { StatsSkeleton, ServiceSkeleton, TestimonialSkeleton } from "@/components/ui/loading"
+import useHomeData from "@/hooks/useHomeData"
+
+// Mapeo de iconos string a componentes
+const iconMap: { [key: string]: any } = {
+  Building2,
+  Heart,
+  Gavel,
+  Briefcase,
+  Shield,
+  Home,
+  Scale,
+  Users,
+  Award
+}
 
 export default function HomePage() {
+  const { homeData, isLoading, error } = useHomeData()
+
+  // Usar datos de la API si están disponibles, sino usar fallback del hook
+  const stats = homeData?.Stats || { CasosExitosos: 0, AñosExperiencia: 0, AbogadosExpertos: 0, SatisfaccionCliente: 0 }
+  const services = homeData?.FeaturedServices || []
+  const testimonials = homeData?.Testimonials || []
+
+  // Función para obtener el componente de icono
+  const getIconComponent = (iconName: string) => {
+    return iconMap[iconName] || Scale
+  }
+
+  // Función para renderizar estrellas
+  const renderStars = (rating: number) => {
+    return [...Array(rating)].map((_, i) => (
+      <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+    ))
+  }
+
+  // Mostrar contenido inmediatamente con skeletons cuando sea necesario
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
  
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 dark:from-slate-950 dark:via-blue-950 dark:to-slate-900 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative container mx-auto px-4 py-24 lg:py-32">
+      <section className="relative text-white">
+        {/* Animated background, allow pointer events */}
+        <StarsBackground className="absolute inset-0 z-0 pointer-events-auto" starColor="#3b82f6" />
+        {/* Overlay, do not block pointer events */}
+        <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
+        <div className="relative z-10 container mx-auto px-4 py-24 lg:py-32">
           <div className="max-w-4xl mx-auto text-center">
             <Badge variant="secondary" className="mb-6 bg-blue-100 text-blue-800 hover:bg-blue-200">
               Más de 25 años de experiencia
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               Defendemos Sus Derechos con
-              <span className="text-blue-300"> Excelencia Legal</span>
+              <GradientText className="md:pl-3" text="Excelencia Legal" />
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed">
               Bufete de abogados líder especializado en brindar soluciones legales integrales con un enfoque
@@ -45,26 +88,38 @@ export default function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+      <section className="py-16 bg-gray-50 dark:bg-neutral-900">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">500+</div>
-              <div className="text-gray-600 dark:text-gray-300">Casos Exitosos</div>
+          {isLoading ? (
+            <StatsSkeleton count={4} />
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                  {`${stats.CasosExitosos}+`}
+                </div>
+                <div className="text-gray-600 dark:text-gray-300">Casos Exitosos</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                  {`${stats.AñosExperiencia}+`}
+                </div>
+                <div className="text-gray-600 dark:text-gray-300">Años de Experiencia</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                  {stats.AbogadosExpertos}
+                </div>
+                <div className="text-gray-600 dark:text-gray-300">Abogados Expertos</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                  {`${stats.SatisfaccionCliente}%`}
+                </div>
+                <div className="text-gray-600 dark:text-gray-300">Satisfacción Cliente</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">25+</div>
-              <div className="text-gray-600 dark:text-gray-300">Años de Experiencia</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">15</div>
-              <div className="text-gray-600 dark:text-gray-300">Abogados Expertos</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">98%</div>
-              <div className="text-gray-600 dark:text-gray-300">Satisfacción Cliente</div>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -81,7 +136,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow dark:bg-gray-800 dark:shadow-gray-700">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-transparent dark:shadow-gray-700">
               <CardContent className="p-8 text-center">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Scale className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -94,7 +149,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow dark:bg-gray-800 dark:shadow-gray-700">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-transparent dark:shadow-gray-700">
               <CardContent className="p-8 text-center">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -107,7 +162,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow dark:bg-gray-800 dark:shadow-gray-700">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-transparent dark:shadow-gray-700">
               <CardContent className="p-8 text-center">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Award className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -124,7 +179,7 @@ export default function HomePage() {
       </section>
 
       {/* Services Preview */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-900">
+      <section className="py-20 bg-gray-50 dark:bg-neutral-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Áreas de Práctica</h2>
@@ -134,55 +189,27 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Derecho Corporativo",
-                description: "Asesoría integral para empresas, contratos comerciales y fusiones.",
-                icon: Building2,
-              },
-              {
-                title: "Derecho de Familia",
-                description: "Divorcios, custodia, adopciones y mediación familiar.",
-                icon: Heart,
-              },
-              {
-                title: "Litigios Civiles",
-                description: "Representación en disputas civiles y comerciales complejas.",
-                icon: Gavel,
-              },
-              {
-                title: "Derecho Laboral",
-                description: "Protección de derechos laborales y resolución de conflictos.",
-                icon: Briefcase,
-              },
-              {
-                title: "Derecho Penal",
-                description: "Defensa criminal con experiencia y dedicación completa.",
-                icon: Shield,
-              },
-              {
-                title: "Derecho Inmobiliario",
-                description: "Transacciones inmobiliarias y resolución de disputas de propiedad.",
-                icon: Home,
-              },
-            ].map((service, index) => (
-              <Card
-                key={index}
-                className="border-0 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 dark:bg-gray-800 dark:shadow-gray-700"
-              >
-                <CardContent className="p-6">
-                  <service.icon className="h-12 w-12 text-blue-600 dark:text-blue-400 mb-4" />
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{service.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">{service.description}</p>
-                  <Link
-                    href="/services"
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium inline-flex items-center"
-                  >
-                    Saber más <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
+            {services.map((service, index) => {
+              const IconComponent = getIconComponent(service.Icono)
+              return (
+                <Card
+                  key={index}
+                  className="border-0 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 bg-transparent dark:shadow-gray-700"
+                >
+                  <CardContent className="p-6">
+                    <IconComponent className="h-12 w-12 text-blue-600 dark:text-blue-400 mb-4" />
+                    <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{service.Titulo}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">{service.Descripcion}</p>
+                    <Link
+                      href="/services"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium inline-flex items-center"
+                    >
+                      Saber más <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
 
           <div className="text-center mt-12">
@@ -203,40 +230,16 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                name: "María González",
-                role: "Empresaria",
-                content:
-                  "Excelente servicio y profesionalismo. Me ayudaron a resolver un caso complejo de manera eficiente.",
-                rating: 5,
-              },
-              {
-                name: "Carlos Rodríguez",
-                role: "Director Ejecutivo",
-                content:
-                  "Su experiencia en derecho corporativo fue fundamental para el éxito de nuestra fusión empresarial.",
-                rating: 5,
-              },
-              {
-                name: "Ana Martínez",
-                role: "Madre de Familia",
-                content:
-                  "Muy agradecida por su apoyo durante mi proceso de divorcio. Siempre fueron comprensivos y profesionales.",
-                rating: 5,
-              },
-            ].map((testimonial, index) => (
-              <Card key={index} className="border-0 shadow-lg dark:bg-gray-800 dark:shadow-gray-700 hover:shadow-xl transition-all hover:-translate-y-1">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="border-0 shadow-lg bg-transparent dark:shadow-gray-700 hover:shadow-xl transition-all hover:-translate-y-1">
                 <CardContent className="p-6">
                   <div className="flex mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                    ))}
+                    {renderStars(testimonial.Calificacion)}
                   </div>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 italic">"{testimonial.content}"</p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 italic">&ldquo;{testimonial.Contenido}&rdquo;</p>
                   <div>
-                    <div className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</div>
+                    <div className="font-semibold text-gray-900 dark:text-white">{testimonial.Nombre}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{testimonial.Rol}</div>
                   </div>
                 </CardContent>
               </Card>

@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Scale, Phone } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const navigation = [
     { name: "Inicio", href: "/" },
@@ -17,6 +19,21 @@ export default function Header() {
     { name: "Blog", href: "/blog" },
     { name: "Contacto", href: "/contact" },
   ];
+
+  const { dashboardHref, dashboardLabel } = useMemo(() => {
+    if (user?.rol === "Administrador") {
+      return { dashboardHref: "/dashboard", dashboardLabel: "Dashboard" };
+    } else if (user?.rol === "Abogado") {
+      return {
+        dashboardHref: "/area-de-trabajo",
+        dashboardLabel: "Área de Trabajo",
+      };
+    } else if (user?.rol === "Cliente") {
+      return { dashboardHref: "/perfil", dashboardLabel: "Mi Perfil" };
+    } else {
+      return { dashboardHref: "/", dashboardLabel: "" };
+    }
+  }, [user]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -46,12 +63,32 @@ export default function Header() {
               <span>(555) 123-4567</span>
             </div>
             <ThemeToggle />
-            <Button
-              asChild
-              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-white"
-            >
-              <Link href="/contact">Consulta Gratuita</Link>
-            </Button>
+
+            {user && dashboardLabel ? (
+              <>
+                <Button
+                  asChild
+                  className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white"
+                >
+                  
+                  <Link href={dashboardHref}>{dashboardLabel}</Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={logout}
+                  className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
+                >
+                  Cerrar sesión
+                </Button>
+              </>
+            ) : (
+              <Button
+                asChild
+                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white"
+              >
+                <Link href="/auth/login">Iniciar Sesión</Link>
+              </Button>
+            )}
           </div>
 
           {/* Mobile Navigation */}
@@ -82,6 +119,7 @@ export default function Header() {
                       {item.name}
                     </Link>
                   ))}
+
                   <div className="pt-4 border-t border-border">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-2 text-muted-foreground">
@@ -89,14 +127,36 @@ export default function Header() {
                         <span>(555) 123-4567</span>
                       </div>
                     </div>
-                    <Button
-                      asChild
-                      className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white"
-                    >
-                      <Link href="/contact" onClick={() => setIsOpen(false)}>
-                        Consulta Gratuita
-                      </Link>
-                    </Button>
+
+                    {user && dashboardLabel ? (
+                      <>
+                        <Button
+                          asChild
+                          className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <Link href={dashboardHref}>{dashboardLabel}</Link>
+                        </Button>
+                        <Button
+                          className="w-full border-red-600 text-red-600 hover:bg-red-600 hover:text-white mt-2"
+                          variant="outline"
+                          onClick={() => {
+                            logout();
+                            setIsOpen(false);
+                          }}
+                        >
+                          Cerrar sesión
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        asChild
+                        className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Link href="/auth/login">Iniciar Sesión</Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </SheetContent>

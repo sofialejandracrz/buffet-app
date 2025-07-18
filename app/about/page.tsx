@@ -6,28 +6,21 @@ import { Award, Users, Target, Heart, Linkedin, Mail } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import Link from "next/link"
-import { useEffect, useState } from "react"
-import api from "@/lib/axios"
+import { GradientBackground } from "@/components/animate-ui/backgrounds/gradient"
+import { TeamMemberSkeleton, TeamMemberCard } from "@/components/ui/team-skeleton"
+import useAboutData from "@/hooks/useAboutData"
 
 export default function AboutPage() {
-  const [teamMembers, setTeamMembers] = useState<any[]>([])
-  useEffect(() => {
-    api.get("/api/Empleado")
-      .then(res => {
-        const data = Array.isArray(res.data) ? res.data : [res.data]
-        setTeamMembers(data)
-        console.log("Team members loaded:", data)
-      })
-      .catch(() => setTeamMembers([]))
-  }, [])
+  const { teamMembers, isLoading } = useAboutData()
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 dark:from-slate-950 dark:via-blue-950 dark:to-slate-900 text-white py-20">
-        <div className="container mx-auto px-4">
+      <section className="relative text-white overflow-hidden py-20">
+        <GradientBackground className="absolute inset-0 z-0" />
+        <div className="relative z-10 container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <Badge variant="secondary" className="mb-6 bg-blue-100 text-blue-800">
               Nuestra Historia
@@ -86,7 +79,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="border-0 shadow-lg text-center dark:bg-gray-800 dark:shadow-gray-700">
+            <Card className="border-0 hover:shadow-lg shadow-xl text-center bg-transparent dark:shadow-gray-700">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -99,7 +92,7 @@ export default function AboutPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg text-center dark:bg-gray-800 dark:shadow-gray-700">
+            <Card className="border-0 hover:shadow-lg shadow-xl text-center bg-transparent dark:shadow-gray-700">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Heart className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -111,7 +104,7 @@ export default function AboutPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg text-center dark:bg-gray-800 dark:shadow-gray-700">
+            <Card className="border-0 hover:shadow-lg shadow-xl text-center bg-transparent dark:shadow-gray-700">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Award className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -123,7 +116,7 @@ export default function AboutPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg text-center dark:bg-gray-800 dark:shadow-gray-700">
+            <Card className="border-0 hover:shadow-lg shadow-xl text-center bg-transparent dark:shadow-gray-700">
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -148,44 +141,15 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {teamMembers.map((member, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl dark:shadow-gray-700 dark:bg-gray-800 transition-all hover:-translate-y-1">
-                <CardContent className="p-0">
-                  <div className="relative">
-                    <img
-                      src={member.Imagen || "/placeholder.svg"}
-                      alt={member.Nombre + " " + member.Apellido}
-                      className="w-full h-64 object-cover rounded-t-lg"
-                    />
-                    <div className="absolute top-4 right-4">
-                      <Badge className="bg-blue-600 dark:bg-blue-700 dark:text-white">{member.Experiencia}</Badge>
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">{member.Nombre + " " + member.Apellido}</h3>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">{member.Cargo}</p>
-                    <p className="text-gray-600 dark:text-gray-300 mb-3">{member.Especializacion}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{member.Educacion}</p>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{member.Biografia}</p>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" className="flex-1 bg-transparent">
-                        <Link href={`mailto:${member.Correo}`} passHref className="flex items-center justify-center w-full">
-                          <Mail className="h-4 w-4 mr-2" />
-                          Contactar
-                        </Link>
-                      </Button>
-                      <Button size="sm" variant="outline" asChild>
-                        <a href={member.LinkedinUrl || "#"} target="_blank" rel="noopener noreferrer">
-                          <Linkedin className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {isLoading ? (
+            <TeamMemberSkeleton count={4} />
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {teamMembers.map((member) => (
+                <TeamMemberCard key={member.Id} member={member} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
