@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Calendar, User, Clock, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 interface BlogSkeletonProps {
   count?: number
@@ -94,13 +95,15 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
     <Card className="border-0 shadow-lg hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-700 transition-all hover:-translate-y-1">
       <CardContent className="p-0">
         <div className="relative h-48">
-          <img
+          <Image
             src={post.Imagen || "/placeholder.svg"}
             alt={post.Titulo}
             className="w-full h-full object-cover rounded-t-lg"
+            width={800}
+            height={300}
             onError={(e) => {
-              const img = e.target as HTMLImageElement
-              img.src = "/placeholder.svg"
+              const img = e.target as HTMLImageElement;
+              img.src = "/placeholder.svg";
             }}
           />
           <div className="absolute top-4 left-4">
@@ -166,13 +169,15 @@ export function FeaturedPostCard({ post }: FeaturedPostCardProps) {
     <Card className="border-0 shadow-xl overflow-hidden dark:bg-gray-800 dark:shadow-gray-700 hover:shadow-lg transition-all hover:-translate-y-1">
       <div className="grid lg:grid-cols-2 gap-0">
         <div className="relative h-64 lg:h-auto">
-          <img
+          <Image
             src={post.Imagen || "/placeholder.svg"}
             alt={post.Titulo}
             className="w-full h-full object-cover"
+            width={800}
+            height={300}
             onError={(e) => {
-              const img = e.target as HTMLImageElement
-              img.src = "/placeholder.svg"
+              const img = e.target as HTMLImageElement;
+              img.src = "/placeholder.svg";
             }}
           />
           <div className="absolute top-4 left-4">

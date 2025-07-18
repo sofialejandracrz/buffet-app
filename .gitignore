@@ -42,3 +42,5 @@ next-env.d.ts
 
 /Models
 /Controllers
+
+/Program.cs

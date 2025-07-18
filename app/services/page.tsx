@@ -1,5 +1,5 @@
 'use client'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -9,8 +9,6 @@ import {
   Briefcase,
   Shield,
   Home,
-  CheckCircle,
-  ArrowRight,
   Clock,
   Award,
   Scale,
@@ -25,7 +23,7 @@ export default function ServicesPage() {
   const { services, isLoading } = useServicesData()
 
   // Mapeo de iconos string a componentes
-  const iconMap: { [key: string]: any } = {
+  const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
     Building2,
     Heart,
     Gavel,

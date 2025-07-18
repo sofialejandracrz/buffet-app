@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Mail, Linkedin } from "lucide-react"
+import Image from "next/image"
 
 interface TeamMemberSkeletonProps {
   count?: number
@@ -61,13 +62,15 @@ export function TeamMemberCard({ member }: TeamMemberFallbackProps) {
     <Card className="border-0 shadow-lg hover:shadow-xl dark:shadow-gray-700 bg-transparent transition-all hover:-translate-y-1">
       <CardContent className="p-0">
         <div className="relative">
-          <img
+          <Image
             src={member.Imagen || "/placeholder.svg"}
             alt={`${member.Nombre} ${member.Apellido}`}
             className="w-full h-64 object-cover rounded-t-lg"
+            width={800}
+            height={256}
             onError={(e) => {
-              const img = e.target as HTMLImageElement
-              img.src = "/placeholder.svg"
+              const img = e.target as HTMLImageElement;
+              img.src = "/placeholder.svg";
             }}
           />
           <div className="absolute top-4 right-4">

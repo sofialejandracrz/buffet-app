@@ -1,9 +1,8 @@
 'use client'
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Calendar, User, ArrowRight, Search, Clock } from "lucide-react"
+import { Search } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { BlogPostsSkeleton, FeaturedPostSkeleton, BlogPostCard, FeaturedPostCard } from "@/components/ui/blog-skeleton"

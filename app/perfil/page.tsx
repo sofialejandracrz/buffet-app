@@ -95,7 +95,7 @@ export default function PerfilPage() {
         </div>
         <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
           <p className="text-sm text-blue-100 mb-1">Frase del día:</p>
-          <p className="font-medium italic">"{randomQuote}"</p>
+          <p className="font-medium italic">&ldquo;{randomQuote}&rdquo;</p>
         </div>
       </div>
 

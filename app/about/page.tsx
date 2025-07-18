@@ -2,10 +2,11 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Award, Users, Target, Heart, Linkedin, Mail } from "lucide-react"
+import { Award, Users, Target, Heart } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import Link from "next/link"
+import Image from "next/image"
 import { GradientBackground } from "@/components/animate-ui/backgrounds/gradient"
 import { TeamMemberSkeleton, TeamMemberCard } from "@/components/ui/team-skeleton"
 import useAboutData from "@/hooks/useAboutData"
@@ -58,10 +59,12 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="relative">
-              <img
+              <Image
                 src="/placeholder.svg?height=400&width=600"
                 alt="Historia del bufete"
                 className="rounded-lg shadow-xl"
+                width={600}
+                height={400}
               />
             </div>
           </div>
