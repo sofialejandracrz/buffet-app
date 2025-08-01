@@ -5,6 +5,8 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import api from "@/lib/axios"
+import { useCaseDetails } from "@/hooks/useCaseDetails"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -83,6 +85,162 @@ interface CaseDetail {
   lawyer: LawyerInfo
   timeline: TimelineEvent[]
   documents: Document[]
+}
+
+// Interfaces para datos de la API
+interface CaseDto {
+  id: number
+  caseNumber: string
+  title: string
+  description: string
+  clientId: number
+  clientName: string
+  lawyerId?: number
+  lawyerName?: string
+  serviceTypeId: number
+  serviceTypeName: string
+  statusId: number
+  statusName: string
+  priority: string
+  estimatedValue: number
+  actualValue: number
+  startDate: string
+  endDate?: string
+  dueDate?: string
+  notes?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt?: string
+  totalActivities: number
+  totalDocuments: number
+  lastActivity?: string
+  recentActivities: CaseActivityDto[]
+  documents: CaseDocumentDto[]
+}
+
+interface CaseActivityDto {
+  id: number
+  caseId: number
+  lawyerId: number
+  lawyerName: string
+  activityType: string
+  description: string
+  hoursWorked?: number
+  billableAmount?: number
+  activityDate: string
+  createdAt: string
+}
+
+interface CaseDocumentDto {
+  id: number
+  caseId: number
+  fileName: string
+  originalFileName: string
+  filePath: string
+  fileType: string
+  fileSize: number
+  documentType: string
+  description?: string
+  uploadedById: string
+  uploadedByName: string
+  uploadedAt: string
+  isPublic: boolean
+}
+
+// Funciones de mapeo de datos API a UI
+const mapStatusFromAPI = (statusName: string): CaseDetail["status"] => {
+  const statusMap: Record<string, CaseDetail["status"]> = {
+    'Nuevo': 'pending',
+    'Pendiente': 'pending',
+    'En Progreso': 'in_progress',
+    'En Curso': 'in_progress',
+    'En Revisión': 'in_progress',
+    'Pausado': 'pending',
+    'Completado': 'completed',
+    'Cerrado': 'completed',
+    'Cancelado': 'cancelled',
+  }
+  
+  return statusMap[statusName] || 'pending'
+}
+
+const mapPriorityFromAPI = (priority: string): CaseDetail["priority"] => {
+  const priorityMap: Record<string, CaseDetail["priority"]> = {
+    'Baja': 'low',
+    'Media': 'medium',
+    'Alta': 'high',
+    'Urgente': 'high',
+  }
+  
+  return priorityMap[priority] || 'medium'
+}
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+const mapActivitiesToTimeline = (activities: CaseActivityDto[]): TimelineEvent[] => {
+  return activities.map(activity => ({
+    id: activity.id.toString(),
+    type: 'comment' as const,
+    title: activity.activityType,
+    description: activity.description,
+    date: activity.activityDate,
+    time: new Date(activity.activityDate).toLocaleTimeString('es-ES', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    }),
+    author: activity.lawyerName,
+    icon: MessageSquare,
+    color: 'text-blue-600'
+  }))
+}
+
+const mapDocumentsToUI = (apiDocs: CaseDocumentDto[]): Document[] => {
+  return apiDocs.map(doc => ({
+    id: doc.id.toString(),
+    name: doc.originalFileName,
+    type: doc.fileType.toUpperCase(),
+    size: formatFileSize(doc.fileSize),
+    uploadDate: doc.uploadedAt,
+    downloadUrl: `/api/Cases/documents/${doc.id}/download`,
+    icon: FileText
+  }))
+}
+
+const mapApiDataToUI = (apiData: CaseDto, activities: CaseActivityDto[] = [], documents: CaseDocumentDto[] = []): CaseDetail => {
+  return {
+    id: apiData.id.toString(),
+    title: apiData.title,
+    description: apiData.description,
+    status: mapStatusFromAPI(apiData.statusName),
+    startDate: apiData.startDate,
+    lastUpdate: apiData.updatedAt || apiData.createdAt,
+    caseNumber: apiData.caseNumber,
+    category: apiData.serviceTypeName,
+    priority: mapPriorityFromAPI(apiData.priority),
+    totalAmount: apiData.estimatedValue,
+    paidAmount: apiData.actualValue,
+    lawyer: {
+      id: apiData.lawyerId?.toString() || 'unassigned',
+      name: apiData.lawyerName || 'Sin asignar',
+      specialization: apiData.serviceTypeName,
+      email: 'contacto@bufete.com',
+      phone: '+34 900 000 000',
+      avatar: '/placeholder.svg?height=100&width=100',
+      rating: 4.5,
+      experience: '10 años',
+      cases: 150,
+      location: 'España',
+      bio: `Abogado especialista en ${apiData.serviceTypeName} con amplia experiencia en casos similares.`,
+    },
+    timeline: mapActivitiesToTimeline(activities),
+    documents: mapDocumentsToUI(documents)
+  }
 }
 
 // Datos simulados - en una aplicación real vendrían de una API
@@ -376,27 +534,30 @@ const statusConfig = {
 
 export default function CaseDetailPage() {
   const params = useParams()
+  const { caseData: apiCaseData, activities, documents, loading, error, refetch } = useCaseDetails()
   const [caseData, setCaseData] = useState<CaseDetail | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Simular carga de datos
-    const loadCaseData = async () => {
-      setIsLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      const data = getCaseDetail(params.id as string)
-      setCaseData(data)
-      setIsLoading(false)
+    if (params.id) {
+      refetch(params.id as string)
     }
+  }, [params.id, refetch])
 
-    loadCaseData()
-  }, [params.id])
+  useEffect(() => {
+    if (apiCaseData) {
+      const mappedCase = mapApiDataToUI(apiCaseData, activities, documents)
+      setCaseData(mappedCase)
+    }
+  }, [apiCaseData, activities, documents])
 
   const handleDownload = (document: Document) => {
     toast.success("Descarga iniciada", {
       description: `Descargando ${document.name}...`,
     })
-    // Aquí iría la lógica real de descarga
+    // Implementar lógica real de descarga
+    if (document.downloadUrl) {
+      window.open(document.downloadUrl, '_blank')
+    }
   }
 
   const handlePayment = () => {
@@ -406,15 +567,63 @@ export default function CaseDetailPage() {
     // Aquí iría la redirección al sistema de pagos
   }
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="space-y-6 p-6">
+        <Breadcrumbs />
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-muted rounded w-1/3"></div>
           <div className="h-4 bg-muted rounded w-2/3"></div>
           <div className="h-32 bg-muted rounded"></div>
           <div className="h-64 bg-muted rounded"></div>
         </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6 p-6">
+        <Breadcrumbs />
+        <Card>
+          <CardContent className="text-center py-12">
+            <XCircle className="h-12 w-12 mx-auto text-red-500 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Error al cargar el caso</h3>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <div className="flex gap-2 justify-center">
+              <Link href="/perfil/casos">
+                <Button variant="outline">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Volver a Mis Casos
+                </Button>
+              </Link>
+              <Button onClick={() => refetch(params.id as string)}>
+                Reintentar
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (!caseData) {
+    return (
+      <div className="space-y-6 p-6">
+        <Breadcrumbs />
+        <Card>
+          <CardContent className="text-center py-12">
+            <XCircle className="h-12 w-12 mx-auto text-red-500 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Caso no encontrado</h3>
+            <p className="text-muted-foreground mb-4">El caso que buscas no existe o no tienes permisos para verlo.</p>
+            <Link href="/perfil/casos">
+              <Button>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Volver a Mis Casos
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     )
   }

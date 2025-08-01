@@ -8,7 +8,7 @@ import Footer from "@/components/footer"
 import Link from "next/link"
 import Image from "next/image"
 import { GradientBackground } from "@/components/animate-ui/backgrounds/gradient"
-import { TeamMemberSkeleton, TeamMemberCard } from "@/components/ui/team-skeleton"
+import { TeamMemberSkeleton, TeamMemberCard } from "@/components/team-skeleton"
 import useAboutData from "@/hooks/useAboutData"
 
 export default function AboutPage() {
@@ -173,4 +173,3 @@ export default function AboutPage() {
     </div>
   )
 }
-

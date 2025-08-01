@@ -5,7 +5,7 @@ import { UnifiedLoginForm } from "@/components/forms/form-login-unified";
 
 export default function LoginPage() {
   return (
-    <div className="dark relative flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div className="relative flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       {/* Fondo de estrellas */}
       <StarsBackground className="absolute inset-0 z-0" />
 

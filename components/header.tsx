@@ -21,7 +21,7 @@ export default function Header() {
   ];
 
   const { dashboardHref, dashboardLabel } = useMemo(() => {
-    if (user?.rol === "Administrador") {
+    if (user?.rol === "SuperAdmin" || user?.rol === "Administrador") {
       return { dashboardHref: "/dashboard", dashboardLabel: "Dashboard" };
     } else if (user?.rol === "Abogado") {
       return {

@@ -8,24 +8,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Scale, UserCheck } from "lucide-react";
+import { User, Scale, UserCheck, Eye, EyeOff } from "lucide-react";
 import api from "@/lib/axios";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 
 interface LoginResponse {
-  success: boolean;
   message: string;
-  data: {
-    token: string;
-    refreshToken: string;
-    user: {
-      id: string;
-      correo: string;
-      rol: string;
-    };
+  token: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+    email: string;
+    phoneNumber?: string;
+    isActive: boolean;
+    createdAt: string;
+    lastLoginAt?: string;
+    roles: any[];
   };
-  errors?: string[];
+  role: string;
+  expiresAt: string;
 }
 
 export function UnifiedLoginForm({
@@ -38,6 +43,7 @@ export function UnifiedLoginForm({
     userType: "Cliente" as "Cliente" | "Abogado" | "Administrador" 
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,10 +59,11 @@ export function UnifiedLoginForm({
     setLoading(true);
 
     try {
-      const response = await api.post<LoginResponse>("/auth/login", form);
-
-      if (response.data.success) {
-        const { token, refreshToken, user } = response.data.data;
+      const response = await api.post<LoginResponse>("/Auth/login", form);
+      console.log("Login response:", response.data);
+      
+      if (response.data.token) {
+        const { token, refreshToken, user, role } = response.data;
         
         // Almacenar tokens
         localStorage.setItem("token", token);
@@ -66,10 +73,16 @@ export function UnifiedLoginForm({
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         // Decodificar token para obtener información del usuario
-        const decodedToken = jwtDecode<{ rol: string }>(token);
+        const decodedToken = jwtDecode<{ 
+          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": string 
+        }>(token);
+        
+        // Obtener el rol del token decodificado o de la respuesta
+        const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || role;
         
         // Redirigir según el rol
-        switch (decodedToken.rol || user.rol) {
+        switch (userRole) {
+          case "SuperAdmin":
           case "Administrador":
             router.push("/dashboard");
             break;
@@ -181,16 +194,30 @@ export function UnifiedLoginForm({
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="password">Contraseña</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={form.password}
+                    onChange={handleChange}
+                    required
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
               </div>
-              <Button type="submit" disabled={loading} className="w-full">
+              <Button type="submit" disabled={loading} className="w-full hover:scale-105 transition-all duration-300">
                 {loading ? "Ingresando..." : "Ingresar"}
               </Button>
               

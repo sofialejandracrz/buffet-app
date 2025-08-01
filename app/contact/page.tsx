@@ -13,8 +13,11 @@ import { Badge } from "@/components/ui/badge"
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { ContactInfoSkeleton } from "@/components/contact-skeleton"
+import useContactData from "@/hooks/useContactData"
 
 export default function ContactPage() {
+  const { contactInfo, isLoading } = useContactData()
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
@@ -73,8 +76,8 @@ export default function ContactPage() {
                   {isSubmitted ? (
                     <div className="text-center py-8">
                       <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">¡Mensaje Enviado!</h3>
-                      <p className="text-gray-600">
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">¡Mensaje Enviado!</h3>
+                      <p className="text-gray-600 dark:text-gray-300">
                         Gracias por contactarnos. Nos pondremos en contacto con usted pronto.
                       </p>
                     </div>
@@ -122,7 +125,7 @@ export default function ContactPage() {
                             type="tel"
                             value={formData.phone}
                             onChange={(e) => handleChange("phone", e.target.value)}
-                            placeholder="(555) 123-4567"
+                            placeholder={contactInfo.telefono}
                           />
                         </div>
                       </div>
@@ -165,7 +168,7 @@ export default function ContactPage() {
                         Enviar Consulta
                       </Button>
 
-                      <p className="text-sm text-gray-500 text-center">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
                         * Campos obligatorios. Su información es completamente confidencial.
                       </p>
                     </form>
@@ -176,86 +179,98 @@ export default function ContactPage() {
 
             {/* Contact Information */}
             <div className="space-y-8">
-              {/* Office Info */}
-              <Card className="border-0 shadow-lg dark:bg-gray-800">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Información de Contacto</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-start space-x-3">
-                      <MapPin className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Dirección</p>
-                        <p className="text-gray-600 dark:text-gray-300">
-                          123 Calle Principal
-                          <br />
-                          Suite 456
-                          <br />
-                          Ciudad, Estado 12345
+              {isLoading ? (
+                <ContactInfoSkeleton />
+              ) : (
+                <>
+                  {/* Office Info */}
+                  <Card className="border-0 shadow-lg dark:bg-gray-800">
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                        Información de Contacto
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="flex items-start space-x-3">
+                          <MapPin className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">Dirección</p>
+                            <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line">
+                              {contactInfo.direccion}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3">
+                          <Phone className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">Teléfono</p>
+                            <p className="text-gray-600 dark:text-gray-300">{contactInfo.telefono}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3">
+                          <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">Email</p>
+                            <p className="text-gray-600 dark:text-gray-300">{contactInfo.email}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Office Hours */}
+                  <Card className="border-0 shadow-lg dark:bg-gray-800">
+                    <CardContent className="p-6">
+                      <div className="flex items-center space-x-2 mb-4">
+                        <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Horarios de Atención</h3>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-300">Lunes - Viernes</span>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {contactInfo.horarioAtencion.lunesViernes}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-300">Sábados</span>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {contactInfo.horarioAtencion.sabados}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-300">Domingos</span>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {contactInfo.horarioAtencion.domingos}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                        <p className="text-sm text-blue-800 dark:text-blue-200">
+                          <strong>Emergencias:</strong> Disponibles 24/7 para casos urgentes
                         </p>
                       </div>
-                    </div>
+                    </CardContent>
+                  </Card>
 
-                    <div className="flex items-center space-x-3">
-                      <Phone className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Teléfono</p>
-                        <p className="text-gray-600 dark:text-gray-300">(555) 123-4567</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-3">
-                      <Mail className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Email</p>
-                        <p className="text-gray-600 dark:text-gray-300">info@lexfirm.com</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Office Hours */}
-              <Card className="border-0 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Clock className="h-5 w-5 text-blue-600" />
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Horarios de Atención</h3>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Lunes - Viernes</span>
-                      <span className="font-medium">8:00 AM - 6:00 PM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Sábados</span>
-                      <span className="font-medium">9:00 AM - 2:00 PM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Domingos</span>
-                      <span className="font-medium">Cerrado</span>
-                    </div>
-                  </div>
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-800">
-                      <strong>Emergencias:</strong> Disponibles 24/7 para casos urgentes
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Emergency Contact */}
-              <Card className="border-0 shadow-lg bg-red-50 dark:bg-red-950">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold text-red-900 dark:text-red-100 mb-4">Contacto de Emergencia</h3>
-                  <p className="text-red-800 dark:text-red-200 mb-4">
-                    Para asuntos legales urgentes fuera del horario de oficina:
-                  </p>
-                  <Button className="w-full bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800">
-                    <Phone className="mr-2 h-4 w-4" />
-                    (555) 999-HELP
-                  </Button>
-                </CardContent>
-              </Card>
+                  {/* Emergency Contact */}
+                  <Card className="border-0 shadow-lg bg-red-50 dark:bg-red-950">
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-semibold text-red-900 dark:text-red-100 mb-4">
+                        Contacto de Emergencia
+                      </h3>
+                      <p className="text-red-800 dark:text-red-200 mb-4">
+                        Para asuntos legales urgentes fuera del horario de oficina:
+                      </p>
+                      <Button className="w-full bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800">
+                        <Phone className="mr-2 h-4 w-4" />
+                        {contactInfo.telefonoEmergencia}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -277,7 +292,7 @@ export default function ContactPage() {
               <p className="text-gray-600 dark:text-gray-300">
                 Mapa interactivo se cargaría aquí
                 <br />
-                123 Calle Principal, Ciudad, Estado 12345
+                {contactInfo.direccion.split("\n")[0]}
               </p>
             </div>
           </div>
