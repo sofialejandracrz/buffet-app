@@ -42,5 +42,6 @@ next-env.d.ts
 
 /Models
 /Controllers
+/back-end-bufete
 
-/Program.cs
+

@@ -9,7 +9,7 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { StarsBackground } from "@/components/animate-ui/backgrounds/stars"
 import { GradientText } from "@/components/animate-ui/text/gradient"
-import { StatsSkeleton } from "@/components/ui/loading"
+import { StatsSkeleton } from "@/components/loading"
 import useHomeData from "@/hooks/useHomeData"
 
 // Mapeo de iconos string a componentes
@@ -54,7 +54,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative text-white">
         {/* Animated background, allow pointer events */}
-        <StarsBackground className="absolute inset-0 z-0 pointer-events-auto" starColor="#3b82f6" />
+        <StarsBackground className="absolute inset-0 z-0 pointer-events-auto" starColor="#3b82f6"  />
         {/* Overlay, do not block pointer events */}
         <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
         <div className="relative z-10 container mx-auto px-4 py-24 lg:py-32">

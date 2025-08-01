@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -29,148 +27,113 @@ import {
   CheckCircle,
   Clock,
   Star,
+  Loader2,
 } from "lucide-react"
 import { toast } from "sonner"
+import api from "@/lib/axios"
+import { useAuth } from "@/hooks/useAuth"
 
-interface LegalService {
-  id: string
+interface ServiceType {
+  id: number
   name: string
   description: string
-  detailedDescription: string
   basePrice: number
-  duration: string
-  icon: React.ComponentType<{ className?: string }>
-  category: string
-  rating: number
-  completedCases: number
-  features: string[]
+  isActive: boolean
+  createdAt: string
+  updatedAt: string | null
+  totalCases: number
+  activeCases: number
+  totalRevenue: number
 }
 
-const legalServices: LegalService[] = [
-  {
-    id: "consulta-general",
-    name: "Consulta Legal General",
-    description: "Asesoría legal básica para resolver dudas y orientación jurídica inicial.",
-    detailedDescription:
-      "Consulta personalizada con abogado especializado para resolver dudas legales, análisis preliminar de documentos y orientación sobre procedimientos legales.",
-    basePrice: 150,
-    duration: "1-2 horas",
-    icon: Scale,
-    category: "Consultoría",
-    rating: 4.8,
-    completedCases: 245,
-    features: ["Consulta personalizada", "Análisis de documentos", "Orientación jurídica", "Seguimiento por email"],
-  },
-  {
-    id: "derecho-civil",
-    name: "Derecho Civil",
-    description: "Contratos, responsabilidad civil, daños y perjuicios, y disputas civiles.",
-    detailedDescription:
-      "Representación legal en casos civiles, redacción de contratos, demandas por daños y perjuicios, y resolución de conflictos entre particulares.",
-    basePrice: 300,
-    duration: "2-4 semanas",
-    icon: FileText,
-    category: "Litigio",
-    rating: 4.9,
-    completedCases: 189,
-    features: ["Redacción de contratos", "Representación en juicios", "Mediación", "Asesoría especializada"],
-  },
-  {
-    id: "derecho-inmobiliario",
-    name: "Derecho Inmobiliario",
-    description: "Compraventa, arrendamientos, hipotecas y disputas de propiedad.",
-    detailedDescription:
-      "Asesoría completa en transacciones inmobiliarias, revisión de contratos de compraventa, gestión de hipotecas y resolución de conflictos de propiedad.",
-    basePrice: 250,
-    duration: "1-3 semanas",
-    icon: Home,
-    category: "Inmobiliario",
-    rating: 4.7,
-    completedCases: 156,
-    features: ["Revisión de contratos", "Due diligence", "Gestión de escrituras", "Resolución de conflictos"],
-  },
-  {
-    id: "derecho-laboral",
-    name: "Derecho Laboral",
-    description: "Despidos, acoso laboral, contratos de trabajo y derechos del trabajador.",
-    detailedDescription:
-      "Defensa de derechos laborales, representación en despidos improcedentes, asesoría en contratos laborales y casos de acoso en el trabajo.",
-    basePrice: 200,
-    duration: "2-6 semanas",
-    icon: Briefcase,
-    category: "Laboral",
-    rating: 4.6,
-    completedCases: 203,
-    features: ["Defensa en despidos", "Contratos laborales", "Mediación laboral", "Cálculo de indemnizaciones"],
-  },
-  {
-    id: "derecho-familiar",
-    name: "Derecho de Familia",
-    description: "Divorcios, custodia, pensión alimenticia y adopciones.",
-    detailedDescription:
-      "Asesoría integral en derecho de familia, procesos de divorcio, custodia de menores, pensiones alimenticias y procedimientos de adopción.",
-    basePrice: 350,
-    duration: "1-6 meses",
-    icon: Users,
-    category: "Familia",
-    rating: 4.9,
-    completedCases: 134,
-    features: ["Procesos de divorcio", "Custodia de menores", "Pensiones alimenticias", "Mediación familiar"],
-  },
-  {
-    id: "derecho-penal",
-    name: "Derecho Penal",
-    description: "Defensa penal, delitos menores y mayores, y representación en juicios.",
-    detailedDescription:
-      "Defensa penal especializada, representación en delitos menores y mayores, asesoría en procedimientos penales y protección de derechos del imputado.",
-    basePrice: 500,
-    duration: "2-12 meses",
-    icon: Shield,
-    category: "Penal",
-    rating: 4.8,
-    completedCases: 98,
-    features: ["Defensa penal", "Representación en juicios", "Asesoría procesal", "Protección de derechos"],
-  },
-  {
-    id: "derecho-empresarial",
-    name: "Derecho Empresarial",
-    description: "Constitución de empresas, contratos comerciales y asesoría corporativa.",
-    detailedDescription:
-      "Asesoría integral para empresas, constitución de sociedades, redacción de contratos comerciales, compliance y restructuración empresarial.",
-    basePrice: 400,
-    duration: "1-8 semanas",
-    icon: Building,
-    category: "Empresarial",
-    rating: 4.7,
-    completedCases: 167,
-    features: ["Constitución de empresas", "Contratos comerciales", "Compliance", "Asesoría corporativa"],
-  },
-  {
-    id: "derecho-salud",
-    name: "Derecho Sanitario",
-    description: "Negligencia médica, derechos del paciente y responsabilidad sanitaria.",
-    detailedDescription:
-      "Especialización en casos de negligencia médica, defensa de derechos del paciente, responsabilidad sanitaria y mala praxis profesional.",
-    basePrice: 450,
-    duration: "3-18 meses",
-    icon: Heart,
-    category: "Sanitario",
-    rating: 4.5,
-    completedCases: 76,
-    features: ["Casos de negligencia", "Derechos del paciente", "Peritajes médicos", "Indemnizaciones"],
-  },
-]
+interface LegalService extends ServiceType {
+  icon: React.ComponentType<{ className?: string }>
+  category: string
+}
+
+interface CreateCaseRequest {
+  title: string
+  description: string
+  clientId: number
+  serviceTypeId: number
+  priority: string
+  estimatedValue: number
+  startDate: string
+  notes?: string
+}
+
+// Mapeo de iconos para los diferentes tipos de servicio
+const getServiceIcon = (serviceName: string): React.ComponentType<{ className?: string }> => {
+  const name = serviceName.toLowerCase()
+  if (name.includes('civil')) return FileText
+  if (name.includes('penal')) return Shield
+  if (name.includes('laboral')) return Briefcase
+  if (name.includes('familiar') || name.includes('familia')) return Users
+  if (name.includes('mercantil') || name.includes('empresarial') || name.includes('comercial')) return Building
+  if (name.includes('fiscal') || name.includes('tributario')) return Scale
+  if (name.includes('inmobiliario')) return Home
+  if (name.includes('sanitario') || name.includes('salud')) return Heart
+  return Scale // Icono por defecto
+}
+
+// Mapeo de categorías para los diferentes tipos de servicio
+const getServiceCategory = (serviceName: string): string => {
+  const name = serviceName.toLowerCase()
+  if (name.includes('civil')) return 'Civil'
+  if (name.includes('penal')) return 'Penal'
+  if (name.includes('laboral')) return 'Laboral'
+  if (name.includes('familiar') || name.includes('familia')) return 'Familia'
+  if (name.includes('mercantil') || name.includes('empresarial') || name.includes('comercial')) return 'Empresarial'
+  if (name.includes('fiscal') || name.includes('tributario')) return 'Fiscal'
+  if (name.includes('inmobiliario')) return 'Inmobiliario'
+  if (name.includes('sanitario') || name.includes('salud')) return 'Sanitario'
+  return 'General'
+}
 
 export default function ContratarPage() {
+  const { user, loading: authLoading } = useAuth()
+  const [services, setServices] = useState<LegalService[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedService, setSelectedService] = useState<LegalService | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     caseDescription: "",
     urgency: "normal",
-    contactPreference: "email",
     additionalNotes: "",
   })
+
+  // Función para obtener los servicios de la API
+  const fetchServices = async () => {
+    try {
+      setLoading(true)
+      const response = await api.get('/servicetypes')
+      const serviceTypes: ServiceType[] = response.data.data
+      
+      // Mapear los datos de la API con iconos y categorías
+      const mappedServices: LegalService[] = serviceTypes
+        .filter(service => service.isActive)
+        .map(service => ({
+          ...service,
+          icon: getServiceIcon(service.name),
+          category: getServiceCategory(service.name)
+        }))
+      
+      setServices(mappedServices)
+    } catch (error) {
+      console.error('Error al obtener servicios:', error)
+      toast.error("Error al cargar servicios", {
+        description: "No se pudieron cargar los servicios disponibles. Inténtalo más tarde.",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Efecto para cargar los servicios al montar el componente
+  useEffect(() => {
+    fetchServices()
+  }, [])
 
   const handleContractService = (service: LegalService) => {
     setSelectedService(service)
@@ -187,24 +150,72 @@ export default function ContratarPage() {
       return
     }
 
+    if (!selectedService) {
+      toast.error("Error", {
+        description: "No se ha seleccionado un servicio.",
+      })
+      return
+    }
+
+    if (!user) {
+      toast.error("Error", {
+        description: "Debes iniciar sesión para contratar un servicio.",
+      })
+      return
+    }
+
+    // Verificar que el usuario tenga clientId (sea un cliente)
+    if (!user.clientId) {
+      toast.error("Error", {
+        description: "Solo los clientes pueden contratar servicios. Contacta al administrador si hay un problema.",
+      })
+      return
+    }
+
     setIsSubmitting(true)
 
-    // Simular envío de solicitud
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      const caseData: CreateCaseRequest = {
+        title: `Servicio de ${selectedService.name}`,
+        description: formData.caseDescription,
+        clientId: parseInt(user.clientId), // Usar el clientId del token JWT
+        serviceTypeId: selectedService.id,
+        priority: formData.urgency === "low" ? "1" : 
+                 formData.urgency === "normal" ? "2" :
+                 formData.urgency === "high" ? "3" : "4", // 1=Baja, 2=Media, 3=Alta, 4=Urgente
+        estimatedValue: selectedService.basePrice,
+        startDate: new Date().toISOString(),
+        notes: formData.additionalNotes
+      }
 
-    toast.success("¡Solicitud enviada exitosamente!", {
-      description: `Tu solicitud para ${selectedService?.name} ha sido recibida. Te contactaremos pronto.`,
-    })
+      const response = await api.post('/cases', caseData)
+      
+      if (response.data) {
+        toast.success("¡Caso creado exitosamente!", {
+          description: `Tu caso para ${selectedService.name} ha sido creado. Número de caso: ${response.data.data?.caseNumber || 'Sin asignar'}`,
+        })
 
-    setIsSubmitting(false)
-    setIsModalOpen(false)
-    setFormData({
-      caseDescription: "",
-      urgency: "normal",
-      contactPreference: "email",
-      additionalNotes: "",
-    })
-    setSelectedService(null)
+        setIsModalOpen(false)
+        setFormData({
+          caseDescription: "",
+          urgency: "normal",
+          additionalNotes: "",
+        })
+        setSelectedService(null)
+      }
+    } catch (error: any) {
+      console.error('Error al crear caso:', error)
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.errors || 
+                          "No se pudo crear el caso. Inténtalo más tarde."
+      
+      toast.error("Error al crear caso", {
+        description: typeof errorMessage === 'string' ? errorMessage : 
+                    "Ocurrió un error inesperado. Por favor, inténtalo de nuevo.",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleCloseModal = () => {
@@ -213,9 +224,29 @@ export default function ContratarPage() {
     setFormData({
       caseDescription: "",
       urgency: "normal",
-      contactPreference: "email",
       additionalNotes: "",
     })
+  }
+
+  // Mostrar loading si está cargando la autenticacion
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Verificando autenticación...</span>
+        </div>
+      </div>
+    )
+  }
+
+  // verificar si el usuario está autenticado
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Debes iniciar sesión para contratar servicios.</p>
+      </div>
+    )
   }
 
   return (
@@ -231,73 +262,83 @@ export default function ContratarPage() {
       </div>
 
       {/* Servicios disponibles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {legalServices.map((service) => {
-          const IconComponent = service.icon
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span>Cargando servicios...</span>
+          </div>
+        </div>
+      ) : services.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No hay servicios disponibles en este momento.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((service) => {
+            const IconComponent = service.icon
 
-          return (
-            <Card key={service.id} className="flex flex-col hover:shadow-lg transition-shadow duration-200">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <IconComponent className="h-5 w-5 text-primary" />
+            return (
+              <Card key={service.id} className="flex flex-col hover:shadow-lg transition-shadow duration-200">
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <IconComponent className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <Badge variant="secondary" className="text-xs mb-2">
+                          {service.category}
+                        </Badge>
+                      </div>
                     </div>
-                    <div>
-                      <Badge variant="secondary" className="text-xs mb-2">
-                        {service.category}
-                      </Badge>
+                  </div>
+                  <CardTitle className="text-lg">{service.name}</CardTitle>
+                  <CardDescription className="text-sm leading-relaxed">{service.description}</CardDescription>
+                </CardHeader>
+
+                <CardContent className="flex-1 space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Precio base:</span>
+                      <span className="font-semibold text-lg">${service.basePrice}</span>
                     </div>
+                    {service.totalCases > 0 && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Casos completados:</span>
+                        <span className="flex items-center gap-1">
+                          <CheckCircle className="h-3 w-3 text-green-500" />
+                          {service.totalCases}
+                        </span>
+                      </div>
+                    )}
+                    {service.activeCases > 0 && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Casos activos:</span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3 text-blue-500" />
+                          {service.activeCases}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                </div>
-                <CardTitle className="text-lg">{service.name}</CardTitle>
-                <CardDescription className="text-sm leading-relaxed">{service.description}</CardDescription>
-              </CardHeader>
 
-              <CardContent className="flex-1 space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Precio base:</span>
-                    <span className="font-semibold text-lg">${service.basePrice}</span>
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium">Especialización en:</h4>
+                    <p className="text-xs text-muted-foreground">{service.description}</p>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Duración:</span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {service.duration}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Valoración:</span>
-                    <span className="flex items-center gap-1">
-                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                      {service.rating} ({service.completedCases} casos)
-                    </span>
-                  </div>
-                </div>
+                </CardContent>
 
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium">Incluye:</h4>
-                  <ul className="text-xs text-muted-foreground space-y-1">
-                    {service.features.slice(0, 3).map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-green-500 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </CardContent>
-
-              <CardFooter>
-                <Button onClick={() => handleContractService(service)} className="w-full" size="lg">
-                  Contratar Servicio
-                </Button>
-              </CardFooter>
-            </Card>
-          )
-        })}
-      </div>
+                <CardFooter>
+                  <Button onClick={() => handleContractService(service)} className="w-full" size="lg">
+                    Contratar Servicio
+                  </Button>
+                </CardFooter>
+              </Card>
+            )
+          })}
+        </div>
+      )}
 
       {/* Modal para descripción del caso */}
       <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
@@ -307,7 +348,17 @@ export default function ContratarPage() {
               {selectedService && <selectedService.icon className="h-5 w-5" />}
               Contratar: {selectedService?.name}
             </DialogTitle>
-            <DialogDescription className="text-left">{selectedService?.detailedDescription}</DialogDescription>
+            <DialogDescription className="text-left">
+              {selectedService?.description}
+              <br />
+              <span className="text-sm text-muted-foreground">
+                Categoría: {selectedService?.category}
+              </span>
+              <br />
+              <span className="text-sm font-medium text-primary">
+                Al enviar este formulario se creará un nuevo caso legal para tu atención.
+              </span>
+            </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmitRequest} className="space-y-6">
@@ -348,24 +399,6 @@ export default function ContratarPage() {
                 </select>
               </div>
 
-              {/* Preferencia de contacto */}
-              <div className="space-y-2">
-                <Label htmlFor="contactPreference" className="text-sm font-medium">
-                  Preferencia de contacto
-                </Label>
-                <select
-                  id="contactPreference"
-                  value={formData.contactPreference}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, contactPreference: e.target.value }))}
-                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
-                >
-                  <option value="email">Email</option>
-                  <option value="phone">Teléfono</option>
-                  <option value="whatsapp">WhatsApp</option>
-                  <option value="videocall">Videollamada</option>
-                </select>
-              </div>
-
               {/* Notas adicionales */}
               <div className="space-y-2">
                 <Label htmlFor="additionalNotes" className="text-sm font-medium">
@@ -390,10 +423,16 @@ export default function ContratarPage() {
                   <span className="ml-2 font-medium">${selectedService?.basePrice}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Duración estimada:</span>
-                  <span className="ml-2 font-medium">{selectedService?.duration}</span>
+                  <span className="text-muted-foreground">Categoría:</span>
+                  <span className="ml-2 font-medium">{selectedService?.category}</span>
                 </div>
               </div>
+              {selectedService && selectedService.totalCases > 0 && (
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Experiencia:</span>
+                  <span className="ml-2">{selectedService.totalCases} casos completados</span>
+                </div>
+              )}
               <p className="text-xs text-muted-foreground">
                 * El precio final puede variar según la complejidad del caso. Te proporcionaremos un presupuesto
                 detallado después de la evaluación inicial.
@@ -418,10 +457,10 @@ export default function ContratarPage() {
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    Enviando solicitud...
+                    Creando caso...
                   </>
                 ) : (
-                  "Enviar Solicitud"
+                  "Crear Caso"
                 )}
               </Button>
             </DialogFooter>

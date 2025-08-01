@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { BlogPostsSkeleton, FeaturedPostSkeleton, BlogPostCard, FeaturedPostCard } from "@/components/ui/blog-skeleton"
+import { BlogPostsSkeleton, FeaturedPostSkeleton, BlogPostCard, FeaturedPostCard } from "@/components/blog-skeleton"
 import useBlogData from "@/hooks/useBlogData"
 
 export default function BlogPage() {

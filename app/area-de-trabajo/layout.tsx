@@ -1,12 +1,13 @@
-"use client";
+"use client"
 
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import type React from "react"
+
+import { SidebarAbogado } from "@/components/sidebar-abogado"
 
 export default function AreaDeTrabajoLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   // const { user, loading } = useAuth();
 
@@ -28,58 +29,32 @@ export default function AreaDeTrabajoLayout({
   //   return null;
   // }
 
-  const lawyerNavItems = [
-    {
-      title: "Panel Principal",
-      url: "/area-de-trabajo",
-      icon: "LayoutDashboard",
-    },
-    {
-      title: "Mis Casos",
-      url: "/area-de-trabajo/casos",
-      icon: "FolderOpen",
-    },
-    {
-      title: "Mis Clientes",
-      url: "/area-de-trabajo/clientes",
-      icon: "Users",
-    },
-    {
-      title: "Calendario",
-      url: "/area-de-trabajo/calendario",
-      icon: "Calendar",
-    },
-    {
-      title: "Documentos",
-      url: "/area-de-trabajo/documentos",
-      icon: "FileText",
-    },
-    {
-      title: "Configuración",
-      url: "/area-de-trabajo/configuracion",
-      icon: "Settings",
-    },
-  ];
+  // Datos del abogado (cuando se implemente la autenticación)
+  const userData = {
+    name: "Dr. Juan Pérez",
+    email: "juan.perez@bufete.com",
+    avatar: "/placeholder.svg?height=40&width=40",
+  }
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        <AppSidebar
-          navItems={lawyerNavItems}
-          // user={{
-          //   name: user.name || user.sub || "Usuario",
-          //   email: user.email || user["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] || "usuario@ejemplo.com",
-          //   avatar: user.avatar
-          // }}
-          title="Área de Trabajo"
-          subtitle="Panel del Abogado"
-        />
-        <main className="flex-1 overflow-auto">
-          <div className="container mx-auto p-6">
-            {children}
+    <div className="min-h-screen bg-background">
+      {/* Sidebar */}
+      <SidebarAbogado user={userData} />
+
+      {/* Contenido principal */}
+      <div className="lg:pl-64">
+        {/* Header móvil - espacio para el botón de menú */}
+        <div className="lg:hidden h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex items-center justify-center h-full">
+            <h1 className="font-semibold text-lg">Área de Trabajo</h1>
           </div>
+        </div>
+
+        {/* Área de contenido */}
+        <main className="min-h-screen lg:min-h-screen">
+          <div className="container mx-auto max-w-7xl p-6">{children}</div>
         </main>
       </div>
-    </SidebarProvider>
-  );
+    </div>
+  )
 }

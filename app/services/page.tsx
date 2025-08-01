@@ -16,7 +16,7 @@ import {
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import Link from "next/link"
-import { ServiceSkeleton, ServiceCard } from "@/components/ui/service-skeleton"
+import { ServiceSkeleton, ServiceCard } from "@/components/service-skeleton"
 import useServicesData from "@/hooks/useServicesData"
 
 export default function ServicesPage() {
