@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,12 +21,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Breadcrumbs } from "@/components/breadcrumbsPerfil"
 import { User, Mail, Phone, Lock, Save, LogOut, Trash2, Eye, EyeOff, Camera, Shield, Bell, Globe } from "lucide-react"
 import { toast } from "sonner"
+import { useProfileData } from "@/hooks/useProfileData"
+import { usePasswordChange } from "@/hooks/usePasswordChange"
+import { useAuth } from "@/hooks/useAuth"
 
 interface UserProfile {
   firstName: string
   lastName: string
   email: string
   phone: string
+  address: string
+  dateOfBirth: string
+  occupation: string
+  companyName: string
   avatar: string
 }
 
@@ -37,19 +44,49 @@ interface PasswordData {
 }
 
 export default function ConfiguracionPage() {
-  const [isLoading, setIsLoading] = useState(false)
+  // Hooks para manejo de datos y autenticación
+  const { user, logout } = useAuth()
+  const { profileData, isLoading, isUpdating, updateProfile } = useProfileData()
+  const { isChangingPassword, changePassword } = usePasswordChange()
+  
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  // Estado del perfil del usuario
-  const [profileData, setProfileData] = useState<UserProfile>({
-    firstName: "María",
-    lastName: "González",
-    email: "maria.gonzalez@email.com",
-    phone: "+34 612 345 678",
+  // Estado del perfil del usuario - inicializado desde API
+  const [profileFormData, setProfileFormData] = useState<UserProfile>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    dateOfBirth: "",
+    occupation: "",
+    companyName: "",
     avatar: "/placeholder.svg?height=100&width=100",
   })
+
+  // Efecto para cargar datos del perfil cuando se obtienen de la API
+  useEffect(() => {
+    if (profileData) {
+      // Convertir fullName a firstName y lastName
+      const nameParts = profileData.fullName.split(' ')
+      const firstName = nameParts[0] || ""
+      const lastName = nameParts.slice(1).join(' ') || ""
+      
+      setProfileFormData({
+        firstName,
+        lastName,
+        email: profileData.email,
+        phone: profileData.phone || "",
+        address: profileData.address || "",
+        dateOfBirth: profileData.dateOfBirth ? profileData.dateOfBirth.split('T')[0] : "",
+        occupation: profileData.occupation || "",
+        companyName: profileData.companyName || "",
+        avatar: "/placeholder.svg?height=100&width=100",
+      })
+    }
+  }, [profileData])
 
   // Estado para el cambio de contraseña
   const [passwordData, setPasswordData] = useState<PasswordData>({
@@ -64,23 +101,21 @@ export default function ConfiguracionPage() {
   const validateProfile = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!profileData.firstName.trim()) {
+    if (!profileFormData.firstName.trim()) {
       newErrors.firstName = "El nombre es obligatorio"
     }
 
-    if (!profileData.lastName.trim()) {
+    if (!profileFormData.lastName.trim()) {
       newErrors.lastName = "El apellido es obligatorio"
     }
 
-    if (!profileData.email.trim()) {
+    if (!profileFormData.email.trim()) {
       newErrors.email = "El email es obligatorio"
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileFormData.email)) {
       newErrors.email = "El formato del email no es válido"
     }
 
-    if (!profileData.phone.trim()) {
-      newErrors.phone = "El teléfono es obligatorio"
-    } else if (!/^[+]?[\d\s-()]+$/.test(profileData.phone)) {
+    if (profileFormData.phone && !/^[+]?[\d\s-()]+$/.test(profileFormData.phone)) {
       newErrors.phone = "El formato del teléfono no es válido"
     }
 
@@ -114,7 +149,7 @@ export default function ConfiguracionPage() {
   }
 
   const handleProfileChange = (field: keyof UserProfile, value: string) => {
-    setProfileData((prev) => ({ ...prev, [field]: value }))
+    setProfileFormData((prev) => ({ ...prev, [field]: value }))
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }))
@@ -137,21 +172,20 @@ export default function ConfiguracionPage() {
       return
     }
 
-    setIsLoading(true)
+    // Preparar datos para enviar a la API
+    const updateData = {
+      firstName: profileFormData.firstName,
+      lastName: profileFormData.lastName,
+      phoneNumber: profileFormData.phone || undefined,
+      address: profileFormData.address || undefined,
+      dateOfBirth: profileFormData.dateOfBirth || undefined,
+      occupation: profileFormData.occupation || undefined,
+      companyName: profileFormData.companyName || undefined,
+    }
 
-    try {
-      // Simular llamada a API
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      toast.success("Perfil actualizado", {
-        description: "Tu información personal ha sido actualizada correctamente.",
-      })
-    } catch {
-      toast.error("Error", {
-        description: "No se pudo actualizar el perfil. Inténtalo de nuevo.",
-      })
-    } finally {
-      setIsLoading(false)
+    const success = await updateProfile(updateData)
+    if (success) {
+      // El hook ya maneja el toast de éxito
     }
   }
 
@@ -163,36 +197,29 @@ export default function ConfiguracionPage() {
       return
     }
 
-    setIsLoading(true)
+    // Usar el hook real de cambio de contraseña
+    const success = await changePassword({
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword,
+      confirmNewPassword: passwordData.confirmPassword,
+    })
 
-    try {
-      // Simular llamada a API
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      toast.success("Contraseña actualizada", {
-        description: "Tu contraseña ha sido cambiada correctamente.",
-      })
-
-      // Limpiar formulario de contraseña
+    if (success) {
+      // Limpiar formulario de contraseña solo si fue exitoso
       setPasswordData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       })
-    } catch {
-      toast.error("Error", {
-        description: "No se pudo cambiar la contraseña. Verifica que la contraseña actual sea correcta.",
-      })
-    } finally {
-      setIsLoading(false)
     }
   }
 
-  const handleLogout = () => {
-    toast.info("Cerrando sesión", {
-      description: "Redirigiendo a la página de inicio...",
-    })
-    // Aquí iría la lógica real de logout
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } catch (error) {
+      console.error('Error during logout:', error)
+    }
   }
 
   const handleDeleteAccount = () => {
@@ -219,7 +246,38 @@ export default function ConfiguracionPage() {
         <p className="text-muted-foreground">Gestiona tu información personal, seguridad y preferencias de cuenta.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Loading inicial */}
+      {isLoading && !profileData ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          <span className="ml-2 text-muted-foreground">Cargando información del perfil...</span>
+        </div>
+      ) : !user ? (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-muted-foreground">Acceso Requerido</h2>
+            <p className="text-muted-foreground">Debes iniciar sesión para acceder a esta página.</p>
+          </div>
+        </div>
+      ) : user.role !== 'Cliente' ? (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-muted-foreground">Acceso Restringido</h2>
+            <p className="text-muted-foreground">Esta página es solo para clientes registrados.</p>
+          </div>
+        </div>
+      ) : !profileData ? (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-muted-foreground">Perfil no encontrado</h2>
+            <p className="text-muted-foreground">No se pudo cargar tu información de perfil.</p>
+            <Button onClick={() => window.location.reload()} className="mt-4">
+              Reintentar
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Columna principal */}
         <div className="lg:col-span-2 space-y-6">
           {/* Información del perfil */}
@@ -235,10 +293,10 @@ export default function ConfiguracionPage() {
               {/* Avatar */}
               <div className="flex items-center gap-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={profileData.avatar || "/placeholder.svg"} alt="Avatar" />
+                  <AvatarImage src={profileFormData.avatar || "/placeholder.svg"} alt="Avatar" />
                   <AvatarFallback className="text-lg">
-                    {profileData.firstName[0]}
-                    {profileData.lastName[0]}
+                    {profileFormData.firstName[0] || "U"}
+                    {profileFormData.lastName[0] || "S"}
                   </AvatarFallback>
                 </Avatar>
                 <div>
@@ -258,10 +316,11 @@ export default function ConfiguracionPage() {
                   <Label htmlFor="firstName">Nombre *</Label>
                   <Input
                     id="firstName"
-                    value={profileData.firstName}
+                    value={profileFormData.firstName}
                     onChange={(e) => handleProfileChange("firstName", e.target.value)}
                     placeholder="Tu nombre"
                     className={errors.firstName ? "border-red-500" : ""}
+                    disabled={isLoading}
                   />
                   {errors.firstName && <p className="text-sm text-red-500">{errors.firstName}</p>}
                 </div>
@@ -270,10 +329,11 @@ export default function ConfiguracionPage() {
                   <Label htmlFor="lastName">Apellido *</Label>
                   <Input
                     id="lastName"
-                    value={profileData.lastName}
+                    value={profileFormData.lastName}
                     onChange={(e) => handleProfileChange("lastName", e.target.value)}
                     placeholder="Tu apellido"
                     className={errors.lastName ? "border-red-500" : ""}
+                    disabled={isLoading}
                   />
                   {errors.lastName && <p className="text-sm text-red-500">{errors.lastName}</p>}
                 </div>
@@ -286,29 +346,78 @@ export default function ConfiguracionPage() {
                   <Input
                     id="email"
                     type="email"
-                    value={profileData.email}
+                    value={profileFormData.email}
                     onChange={(e) => handleProfileChange("email", e.target.value)}
                     placeholder="tu@email.com"
                     className={`pl-10 ${errors.email ? "border-red-500" : ""}`}
+                    disabled={true} // Email no es editable
                   />
                 </div>
                 {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+                <p className="text-xs text-muted-foreground">El email no se puede modificar por razones de seguridad.</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Número de Teléfono *</Label>
+                <Label htmlFor="phone">Número de Teléfono</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="phone"
                     type="tel"
-                    value={profileData.phone}
+                    value={profileFormData.phone}
                     onChange={(e) => handleProfileChange("phone", e.target.value)}
-                    placeholder="+34 612 345 678"
+                    placeholder="+504 1234-5678"
                     className={`pl-10 ${errors.phone ? "border-red-500" : ""}`}
+                    disabled={isLoading}
                   />
                 </div>
                 {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="address">Dirección</Label>
+                <Input
+                  id="address"
+                  value={profileFormData.address}
+                  onChange={(e) => handleProfileChange("address", e.target.value)}
+                  placeholder="Tu dirección completa"
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="dateOfBirth">Fecha de Nacimiento</Label>
+                  <Input
+                    id="dateOfBirth"
+                    type="date"
+                    value={profileFormData.dateOfBirth}
+                    onChange={(e) => handleProfileChange("dateOfBirth", e.target.value)}
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="occupation">Ocupación</Label>
+                  <Input
+                    id="occupation"
+                    value={profileFormData.occupation}
+                    onChange={(e) => handleProfileChange("occupation", e.target.value)}
+                    placeholder="Tu ocupación"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="companyName">Empresa/Organización</Label>
+                <Input
+                  id="companyName"
+                  value={profileFormData.companyName}
+                  onChange={(e) => handleProfileChange("companyName", e.target.value)}
+                  placeholder="Nombre de tu empresa u organización"
+                  disabled={isLoading}
+                />
               </div>
             </CardContent>
           </Card>
@@ -401,11 +510,15 @@ export default function ConfiguracionPage() {
                 {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
               </div>
 
-              <Button onClick={handleChangePassword} disabled={isLoading} className="w-full md:w-auto">
-                {isLoading ? (
+              <Button 
+                onClick={handleChangePassword} 
+                disabled={isLoading || isUpdating || isChangingPassword} 
+                className="w-full md:w-auto"
+              >
+                {isChangingPassword ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    Cambiando contraseña...
+                    Cambiando...
                   </>
                 ) : (
                   <>
@@ -524,14 +637,15 @@ export default function ConfiguracionPage() {
           </Card>
         </div>
       </div>
+      )}
 
       {/* Botón fijo de guardar cambios */}
       <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t p-4 lg:pl-72">
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">* Los campos marcados son obligatorios</div>
-            <Button onClick={handleSaveProfile} disabled={isLoading} size="lg">
-              {isLoading ? (
+            <Button onClick={handleSaveProfile} disabled={isLoading || isUpdating} size="lg">
+              {isUpdating ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                   Guardando...
