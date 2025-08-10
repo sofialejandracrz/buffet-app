@@ -5,7 +5,6 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import api from "@/lib/axios"
 import { useCaseDetails } from "@/hooks/useCaseDetails"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -95,8 +94,14 @@ interface CaseDto {
   description: string
   clientId: number
   clientName: string
-  lawyerId?: number
+  primaryLawyerId?: number
   lawyerName?: string
+  specializations?: string
+  yearsOfExperience?: string
+  biography?: string
+  email?: string
+  phoneNumber?: string
+  officeLocation?: string
   serviceTypeId: number
   serviceTypeName: string
   statusId: number
@@ -121,7 +126,7 @@ interface CaseDto {
 interface CaseActivityDto {
   id: number
   caseId: number
-  lawyerId: number
+  primaryLawyerId: number
   lawyerName: string
   activityType: string
   description: string
@@ -226,287 +231,21 @@ const mapApiDataToUI = (apiData: CaseDto, activities: CaseActivityDto[] = [], do
     totalAmount: apiData.estimatedValue,
     paidAmount: apiData.actualValue,
     lawyer: {
-      id: apiData.lawyerId?.toString() || 'unassigned',
+      id: apiData.primaryLawyerId?.toString() || 'unassigned',
       name: apiData.lawyerName || 'Sin asignar',
       specialization: apiData.serviceTypeName,
-      email: 'contacto@bufete.com',
-      phone: '+34 900 000 000',
+      email: apiData.email || 'Sin asignar',
+      phone: apiData.phoneNumber || '+34 900 000 000',
       avatar: '/placeholder.svg?height=100&width=100',
       rating: 4.5,
-      experience: '10 años',
+      experience: apiData.yearsOfExperience || '5 años',
       cases: 150,
-      location: 'España',
-      bio: `Abogado especialista en ${apiData.serviceTypeName} con amplia experiencia en casos similares.`,
+      location: apiData.officeLocation || 'Comayagua, Honduras',
+      bio: apiData.biography || 'Abogado especializado con amplia experiencia en diversas áreas legales.',
     },
     timeline: mapActivitiesToTimeline(activities),
     documents: mapDocumentsToUI(documents)
   }
-}
-
-// Datos simulados - en una aplicación real vendrían de una API
-const getCaseDetail = (id: string): CaseDetail | null => {
-  const casesData: Record<string, CaseDetail> = {
-    "1": {
-      id: "1",
-      title: "Consulta sobre Contrato de Arrendamiento",
-      description:
-        "Revisión exhaustiva de cláusulas abusivas en contrato de alquiler de vivienda habitual. El cliente requiere asesoramiento sobre la legalidad de ciertas condiciones impuestas por el arrendador y posibles acciones legales a tomar.",
-      status: "completed",
-      startDate: "2024-01-15",
-      lastUpdate: "2024-01-28",
-      caseNumber: "CASE-2024-001",
-      category: "Derecho Inmobiliario",
-      priority: "medium",
-      totalAmount: 350,
-      paidAmount: 0,
-      lawyer: {
-        id: "lawyer-1",
-        name: "Ana López Martínez",
-        specialization: "Derecho Inmobiliario y Civil",
-        email: "ana.lopez@bufete.com",
-        phone: "+34 912 345 678",
-        avatar: "/placeholder.svg?height=100&width=100",
-        rating: 4.9,
-        experience: "12 años",
-        cases: 245,
-        location: "Madrid, España",
-        bio: "Especialista en derecho inmobiliario con más de una década de experiencia. Experta en contratos de arrendamiento, compraventa y resolución de conflictos de propiedad.",
-      },
-      timeline: [
-        {
-          id: "1",
-          type: "status_change",
-          title: "Caso completado",
-          description: "El caso ha sido resuelto satisfactoriamente. Se ha emitido el informe final.",
-          date: "2024-01-28",
-          time: "14:30",
-          author: "Ana López Martínez",
-          icon: CheckCircle,
-          color: "text-green-600",
-        },
-        {
-          id: "2",
-          type: "document",
-          title: "Informe legal final",
-          description: "Se ha subido el informe final con las conclusiones y recomendaciones.",
-          date: "2024-01-28",
-          time: "14:15",
-          author: "Ana López Martínez",
-          icon: FileText,
-          color: "text-blue-600",
-        },
-        {
-          id: "3",
-          type: "comment",
-          title: "Análisis completado",
-          description:
-            "He completado el análisis del contrato. Las cláusulas 5 y 12 son efectivamente abusivas según la normativa vigente.",
-          date: "2024-01-25",
-          time: "11:20",
-          author: "Ana López Martínez",
-          icon: MessageSquare,
-          color: "text-purple-600",
-        },
-        {
-          id: "4",
-          type: "meeting",
-          title: "Reunión de seguimiento",
-          description: "Reunión telefónica para revisar el progreso del análisis contractual.",
-          date: "2024-01-22",
-          time: "16:00",
-          author: "Ana López Martínez",
-          icon: Phone,
-          color: "text-orange-600",
-        },
-        {
-          id: "5",
-          type: "document",
-          title: "Documentos recibidos",
-          description: "Se han recibido todos los documentos necesarios para el análisis.",
-          date: "2024-01-18",
-          time: "09:45",
-          author: "Sistema",
-          icon: Upload,
-          color: "text-blue-600",
-        },
-        {
-          id: "6",
-          type: "status_change",
-          title: "Caso en progreso",
-          description: "El caso ha sido asignado y se ha iniciado el análisis legal.",
-          date: "2024-01-16",
-          time: "10:30",
-          author: "Ana López Martínez",
-          icon: Clock,
-          color: "text-blue-600",
-        },
-        {
-          id: "7",
-          type: "status_change",
-          title: "Caso creado",
-          description: "Se ha creado el caso y asignado al abogado especialista.",
-          date: "2024-01-15",
-          time: "14:20",
-          author: "Sistema",
-          icon: FileText,
-          color: "text-gray-600",
-        },
-      ],
-      documents: [
-        {
-          id: "doc-1",
-          name: "Informe Legal Final - Análisis Contractual",
-          type: "PDF",
-          size: "2.4 MB",
-          uploadDate: "2024-01-28",
-          downloadUrl: "#",
-          icon: FileText,
-        },
-        {
-          id: "doc-2",
-          name: "Contrato de Arrendamiento Original",
-          type: "PDF",
-          size: "1.8 MB",
-          uploadDate: "2024-01-18",
-          downloadUrl: "#",
-          icon: FileText,
-        },
-        {
-          id: "doc-3",
-          name: "Documentación Adicional del Cliente",
-          type: "ZIP",
-          size: "3.2 MB",
-          uploadDate: "2024-01-18",
-          downloadUrl: "#",
-          icon: FileText,
-        },
-        {
-          id: "doc-4",
-          name: "Normativa Legal Aplicable",
-          type: "PDF",
-          size: "1.1 MB",
-          uploadDate: "2024-01-20",
-          downloadUrl: "#",
-          icon: FileText,
-        },
-      ],
-    },
-    "2": {
-      id: "2",
-      title: "Despido Improcedente",
-      description:
-        "Demanda por despido sin causa justificada. El cliente fue despedido de manera improcedente y busca la reincorporación o indemnización correspondiente.",
-      status: "in_progress",
-      startDate: "2024-02-01",
-      lastUpdate: "2024-02-10",
-      caseNumber: "CASE-2024-002",
-      category: "Derecho Laboral",
-      priority: "high",
-      totalAmount: 500,
-      paidAmount: 200,
-      lawyer: {
-        id: "lawyer-2",
-        name: "Carlos Rodríguez Sánchez",
-        specialization: "Derecho Laboral",
-        email: "carlos.rodriguez@bufete.com",
-        phone: "+34 913 456 789",
-        avatar: "/placeholder.svg?height=100&width=100",
-        rating: 4.8,
-        experience: "15 años",
-        cases: 189,
-        location: "Barcelona, España",
-        bio: "Abogado laboralista con amplia experiencia en despidos improcedentes, negociación colectiva y derechos de los trabajadores.",
-      },
-      timeline: [
-        {
-          id: "1",
-          type: "comment",
-          title: "Preparación de alegaciones",
-          description: "Estoy preparando las alegaciones finales para la vista judicial del próximo martes.",
-          date: "2024-02-10",
-          time: "16:45",
-          author: "Carlos Rodríguez Sánchez",
-          icon: MessageSquare,
-          color: "text-purple-600",
-        },
-        {
-          id: "2",
-          type: "document",
-          title: "Pruebas documentales",
-          description: "Se han incorporado las pruebas documentales adicionales solicitadas por el juzgado.",
-          date: "2024-02-08",
-          time: "12:30",
-          author: "Carlos Rodríguez Sánchez",
-          icon: FileText,
-          color: "text-blue-600",
-        },
-        {
-          id: "3",
-          type: "meeting",
-          title: "Vista judicial programada",
-          description: "Se ha fijado la fecha para la vista judicial. Fecha: 13 de febrero a las 10:00h.",
-          date: "2024-02-05",
-          time: "14:20",
-          author: "Juzgado de lo Social",
-          icon: Calendar,
-          color: "text-orange-600",
-        },
-        {
-          id: "4",
-          type: "status_change",
-          title: "Demanda presentada",
-          description: "La demanda ha sido presentada ante el Juzgado de lo Social correspondiente.",
-          date: "2024-02-03",
-          time: "11:15",
-          author: "Carlos Rodríguez Sánchez",
-          icon: FileText,
-          color: "text-blue-600",
-        },
-        {
-          id: "5",
-          type: "status_change",
-          title: "Caso iniciado",
-          description: "Se ha iniciado el proceso legal y recopilado la documentación necesaria.",
-          date: "2024-02-01",
-          time: "09:30",
-          author: "Carlos Rodríguez Sánchez",
-          icon: Clock,
-          color: "text-blue-600",
-        },
-      ],
-      documents: [
-        {
-          id: "doc-1",
-          name: "Demanda por Despido Improcedente",
-          type: "PDF",
-          size: "3.1 MB",
-          uploadDate: "2024-02-03",
-          downloadUrl: "#",
-          icon: FileText,
-        },
-        {
-          id: "doc-2",
-          name: "Contrato de Trabajo",
-          type: "PDF",
-          size: "1.5 MB",
-          uploadDate: "2024-02-01",
-          downloadUrl: "#",
-          icon: FileText,
-        },
-        {
-          id: "doc-3",
-          name: "Carta de Despido",
-          type: "PDF",
-          size: "0.8 MB",
-          uploadDate: "2024-02-01",
-          downloadUrl: "#",
-          icon: FileText,
-        },
-      ],
-    },
-  }
-
-  return casesData[id] || null
 }
 
 const statusConfig = {
@@ -834,9 +573,9 @@ export default function CaseDetailPage() {
                   <h3 className="font-semibold">{caseData.lawyer.name}</h3>
                   <p className="text-sm text-muted-foreground">{caseData.lawyer.specialization}</p>
                   <div className="flex items-center gap-1 mt-1">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    {/* <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                     <span className="text-xs font-medium">{caseData.lawyer.rating}</span>
-                    <span className="text-xs text-muted-foreground">({caseData.lawyer.cases} casos)</span>
+                    <span className="text-xs text-muted-foreground">({caseData.lawyer.cases} casos)</span> */}
                   </div>
                 </div>
               </div>

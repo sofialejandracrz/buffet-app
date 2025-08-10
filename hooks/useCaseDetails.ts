@@ -8,8 +8,14 @@ interface CaseDto {
   description: string
   clientId: number
   clientName: string
-  lawyerId?: number
+  primaryLawyerId?: number
   lawyerName?: string
+  specializations?: string
+  yearsOfExperience?: string
+  biography?: string
+  email?: string
+  phoneNumber?: string
+  officeLocation?: string
   serviceTypeId: number
   serviceTypeName: string
   statusId: number
@@ -34,7 +40,7 @@ interface CaseDto {
 interface CaseActivityDto {
   id: number
   caseId: number
-  lawyerId: number
+  primaryLawyerId: number
   lawyerName: string
   activityType: string
   description: string
@@ -81,7 +87,7 @@ export const useCaseDetails = (): UseCaseDetailsReturn => {
       setLoading(true);
       setError(null);
 
-      // Llamadas paralelas a múltiples endpoints
+      // Llamadas paralelas a multiples endpoints
       const [caseResponse, activitiesResponse, documentsResponse] = await Promise.all([
         api.get(`/Cases/${caseId}`),
         api.get(`/Cases/${caseId}/activities?page=1&pageSize=50`).catch(() => ({ data: { data: [] } })),
