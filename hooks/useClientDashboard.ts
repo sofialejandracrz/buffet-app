@@ -111,6 +111,12 @@ export function useClientDashboard() {
           dashboard: dashboardRes.data?.data || null,
           notifications: notificationsRes.data?.data || []
         });
+        console.log("Datos del dashboard obtenidos:", {
+          profile: profileRes.data?.data,
+          dashboard: dashboardRes.data?.data,
+          notifications: notificationsRes.data?.data
+        });
+        console.log("Datos del cliente:", dashboardRes.data?.data);
       } catch (err: any) {
         console.error("Error al obtener datos del dashboard:", err);
         setError("Error al cargar los datos");

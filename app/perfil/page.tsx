@@ -334,7 +334,7 @@ export default function PerfilPage() {
                       )}
                       <div className="flex items-center gap-2 mt-2">
                         <Badge variant="secondary" className="text-xs">
-                          {getRelativeTime(activity.createdAt)}
+                          {getRelativeTime(activity.activityDate)}
                         </Badge>
                       </div>
                     </div>

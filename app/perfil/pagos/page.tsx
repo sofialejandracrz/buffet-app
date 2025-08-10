@@ -31,6 +31,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { useInvoiceData } from "@/hooks/useInvoiceData"
+import { jsPDF } from "jspdf"
 
 // Interfaces actualizadas según el hook (mantener compatibilidad con UI existente)
 interface PaymentHistory {
@@ -157,9 +158,9 @@ export default function PagosPage() {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-ES", {
+    return new Intl.NumberFormat("es-HN", {
       style: "currency",
-      currency: "EUR",
+      currency: "USD",
     }).format(amount)
   }
 
@@ -170,11 +171,161 @@ export default function PagosPage() {
     // Aquí iría la integración con el sistema de pagos real
   }
 
-  const handleDownload = (invoiceNumber: string) => {
-    toast.success("Descarga iniciada", {
-      description: `Descargando factura ${invoiceNumber}...`,
-    })
-    // Aquí iría la lógica de descarga real
+  const handleDownload = async (invoiceNumber: string) => {
+    try {
+      toast.info("Generando PDF", {
+        description: `Preparando la descarga de la factura ${invoiceNumber}...`,
+      })
+
+      // Buscar la factura por número
+      const invoice = invoices.find(inv => inv.invoiceNumber === invoiceNumber)
+      if (!invoice) {
+        toast.error("Error", { description: "Factura no encontrada" })
+        return
+      }
+
+      // Crear el PDF
+      const pdf = new jsPDF()
+      const pageWidth = pdf.internal.pageSize.getWidth()
+      const pageHeight = pdf.internal.pageSize.getHeight()
+      
+      // Configurar fuentes
+      pdf.setFont("helvetica")
+      
+      // Encabezado de la empresa
+      pdf.setFontSize(20)
+      pdf.setTextColor(0, 0, 0)
+      pdf.text("LEXFIRM", pageWidth / 2, 30, { align: "center" })
+      
+      pdf.setFontSize(12)
+      pdf.text("Servicios Legales Profesionales", pageWidth / 2, 40, { align: "center" })
+      pdf.text("Tel: +504 1234-5678 | Email: info@lexfirm.com", pageWidth / 2, 50, { align: "center" })
+
+      // Línea separadora
+      pdf.setLineWidth(0.5)
+      pdf.line(20, 60, pageWidth - 20, 60)
+      
+      // Título de la factura
+      pdf.setFontSize(16)
+      pdf.setTextColor(0, 100, 200)
+      pdf.text(`FACTURA ${invoice.invoiceNumber}`, 20, 80)
+      
+      // Información de la factura
+      pdf.setFontSize(10)
+      pdf.setTextColor(0, 0, 0)
+      
+      const infoY = 100
+      pdf.text(`Fecha de emisión: ${formatDate(invoice.issueDate)}`, 20, infoY)
+      pdf.text(`Fecha de vencimiento: ${formatDate(invoice.dueDate)}`, pageWidth - 85, infoY)
+      
+      pdf.text(`Caso: ${invoice.caseTitle}`, 20, infoY + 10)
+      pdf.text(`Estado: ${statusConfig[invoice.status].label}`, pageWidth - 85, infoY + 10)
+
+      if (invoice.caseNumber) {
+        pdf.text(`Número de caso: ${invoice.caseNumber}`, 20, infoY + 20)
+      }
+      
+      // Tabla de servicios
+      const tableStartY = infoY + 40
+      
+      // Encabezados de la tabla
+      pdf.setFillColor(240, 240, 240)
+      pdf.rect(20, tableStartY, pageWidth - 40, 10, 'F')
+      
+      pdf.setFontSize(9)
+      pdf.setTextColor(0, 0, 0)
+      pdf.text("Descripción", 25, tableStartY + 7)
+      pdf.text("Cant.", pageWidth - 120, tableStartY + 7)
+      pdf.text("P. Unit.", pageWidth - 90, tableStartY + 7)
+      pdf.text("Total", pageWidth - 50, tableStartY + 7)
+      
+      // Contenido de la tabla
+      let currentY = tableStartY + 15
+      invoice.items.forEach((item, index) => {
+        // Alternar color de fondo
+        if (index % 2 === 0) {
+          pdf.setFillColor(250, 250, 250)
+          pdf.rect(20, currentY - 5, pageWidth - 40, 10, 'F')
+        }
+        
+        pdf.text(item.description, 25, currentY + 2)
+        pdf.text(item.quantity.toString(), pageWidth - 120, currentY + 2)
+        pdf.text(formatCurrency(item.unitPrice), pageWidth - 90, currentY + 2)
+        pdf.text(formatCurrency(item.total), pageWidth - 50, currentY + 2)
+        
+        currentY += 12
+      })
+      
+      // Linea separadora antes de totales
+      pdf.setLineWidth(0.3)
+      pdf.line(20, currentY + 5, pageWidth - 20, currentY + 5)
+      
+      // Totales
+      const totalsY = currentY + 20
+      pdf.setFontSize(10)
+      
+      // Subtotal
+      pdf.text("Subtotal:", pageWidth - 100, totalsY)
+      pdf.text(formatCurrency(invoice.subTotal), pageWidth - 50, totalsY)
+      
+      // Impuestos
+      if (invoice.taxAmount > 0) {
+        pdf.text("IVA:", pageWidth - 100, totalsY + 10)
+        pdf.text(formatCurrency(invoice.taxAmount), pageWidth - 50, totalsY + 10)
+      }
+      
+      // Descuentos
+      if (invoice.discountAmount > 0) {
+        pdf.text("Descuento:", pageWidth - 100, totalsY + 20)
+        pdf.text(`-${formatCurrency(invoice.discountAmount)}`, pageWidth - 50, totalsY + 20)
+      }
+      
+      // Total
+      pdf.setFontSize(12)
+      pdf.setTextColor(0, 100, 0)
+      const totalY = totalsY + (invoice.taxAmount > 0 ? 30 : 20) + (invoice.discountAmount > 0 ? 10 : 0)
+      pdf.text("TOTAL:", pageWidth - 100, totalY)
+      pdf.text(formatCurrency(invoice.totalAmount), pageWidth - 50, totalY)
+      
+      // Estado de pago
+      const paymentY = totalY + 20
+      pdf.setFontSize(10)
+      pdf.setTextColor(0, 0, 0)
+      pdf.text("Importe pagado:", pageWidth - 100, paymentY)
+      pdf.text(formatCurrency(invoice.paidAmount), pageWidth - 50, paymentY)
+      
+      pdf.setTextColor(200, 0, 0)
+      pdf.text("Pendiente de pago:", pageWidth - 100, paymentY + 10)
+      pdf.text(formatCurrency(invoice.totalAmount - invoice.paidAmount), pageWidth - 50, paymentY + 10)
+      
+      const notesY = paymentY + 30
+      pdf.setFontSize(9)
+      pdf.setTextColor(0, 0, 0)
+      pdf.text(`Notas: ${invoice.notes}.`, 20, notesY)
+      
+      // terminos y condiciones
+      const termsY = pageHeight - 40
+      pdf.setFontSize(8)
+      pdf.setTextColor(100, 100, 100)
+      pdf.text("Términos y condiciones: " + (invoice.terms || "Pago a 30 días."), 20, termsY)
+      
+      // Pie de página
+      pdf.text(`Generado el ${new Date().toLocaleDateString("es-ES")} a las ${new Date().toLocaleTimeString("es-ES")}`, 20, pageHeight - 20)
+      pdf.text("Documento generado electrónicamente", pageWidth / 2, pageHeight - 20, { align: "center" })
+      
+      // Descargar el PDF
+      pdf.save(`Factura_${invoice.invoiceNumber}.pdf`)
+      
+      toast.success("PDF descargado", {
+        description: `La factura ${invoiceNumber} se ha descargado correctamente.`,
+      })
+      
+    } catch (error) {
+      console.error("Error generating PDF:", error)
+      toast.error("Error al generar PDF", {
+        description: "Hubo un problema al generar el archivo PDF. Inténtalo de nuevo.",
+      })
+    }
   }
 
   const StatusBadge = ({ status }: { status: Invoice["status"] }) => {
@@ -345,7 +496,7 @@ export default function PagosPage() {
 
         {/* Notas y archivos adjuntos */}
         <div className="space-y-4">
-          {invoice.notes && (
+          {invoice.notes && invoice.notes.trim() !== "" && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">Notas</CardTitle>
