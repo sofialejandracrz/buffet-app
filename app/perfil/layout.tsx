@@ -1,32 +1,36 @@
-"use client"
-import type React from "react"
-import { Sidebar } from "@/components/sidebarPerfil"
+"use client";
+import type React from "react";
+import { Sidebar } from "@/components/sidebarPerfil";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { redirect } from "next/navigation";
+import { toast } from "sonner";
 
 export default function PerfilLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   const { user, loading: authLoading } = useAuth();
-    useEffect(() => {
-      if (!authLoading && (!user || user.role !== "Cliente")) {
-        redirect("/auth/login");
-      }
-    }, [user, authLoading]);
-    if (authLoading) {
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-        </div>
-      );
+  useEffect(() => {
+    if (!authLoading && (!user || user.role !== "Cliente")) {
+      toast.error("No tienes acceso a esta página", {
+        description: "Por favor, inicia sesión con una cuenta autorizada.",
+      });
+      redirect("/auth/login");
     }
-  
-    if (!user || user.role !== "Cliente") {
-      return null;
-    }
+  }, [user, authLoading]);
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user || user.role !== "Cliente") {
+    return null;
+  }
   return (
     <div className="min-h-screen bg-background">
       {/* Sidebar */}
@@ -47,5 +51,5 @@ export default function PerfilLayout({
         </main>
       </div>
     </div>
-  )
+  );
 }

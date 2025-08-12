@@ -1,20 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useAuth } from "@/hooks/useAuth"
-import { SidebarAbogado } from "@/components/sidebar-abogado"
-import { useEffect } from "react"
-import { redirect } from "next/navigation"
+import type React from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { SidebarAbogado } from "@/components/sidebar-abogado";
+import { useEffect } from "react";
+import { redirect } from "next/navigation";
+import { toast } from "sonner";
 
 export default function AreaDeTrabajoLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-
   const { user, loading: authLoading } = useAuth();
   useEffect(() => {
     if (!authLoading && (!user || user.role !== "Abogado")) {
+      toast.error("No tienes acceso a esta página", {
+        description: "Por favor, inicia sesión con una cuenta autorizada.",
+      });
       redirect("/auth/login");
     }
   }, [user, authLoading]);
@@ -35,7 +38,7 @@ export default function AreaDeTrabajoLayout({
     name: "Dr. Juan Pérez",
     email: "juan.perez@bufete.com",
     avatar: "/placeholder.svg?height=40&width=40",
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,5 +60,5 @@ export default function AreaDeTrabajoLayout({
         </main>
       </div>
     </div>
-  )
+  );
 }

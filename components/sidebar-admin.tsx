@@ -151,7 +151,7 @@ export function SidebarAdmin() {
             <Building2 className="h-5 w-5" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">Bufete Legal</span>
+            <span className="text-sm font-semibold">Lexfirm</span>
             <span className="text-xs text-muted-foreground">Panel Admin</span>
           </div>
         </div>
