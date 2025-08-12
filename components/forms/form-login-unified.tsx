@@ -6,9 +6,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Scale, UserCheck, Eye, EyeOff } from "lucide-react";
+import { User, Eye, EyeOff } from "lucide-react";
 import api from "@/lib/axios";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
@@ -39,8 +38,7 @@ export function UnifiedLoginForm({
 }: React.ComponentProps<"div">) {
   const [form, setForm] = useState({ 
     email: "", 
-    password: "", 
-    userType: "Cliente" as "Cliente" | "Abogado" | "Administrador" 
+    password: ""
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -48,10 +46,6 @@ export function UnifiedLoginForm({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleUserTypeChange = (value: "Cliente" | "Abogado" | "Administrador") => {
-    setForm({ ...form, userType: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,29 +106,11 @@ export function UnifiedLoginForm({
   };
 
   const getUserTypeIcon = () => {
-    switch (form.userType) {
-      case "Administrador":
-        return <UserCheck className="h-4 w-4" />;
-      case "Abogado":
-        return <Scale className="h-4 w-4" />;
-      case "Cliente":
-        return <User className="h-4 w-4" />;
-      default:
-        return <User className="h-4 w-4" />;
-    }
+    return <User className="h-4 w-4" />;
   };
 
   const getUserTypeDescription = () => {
-    switch (form.userType) {
-      case "Administrador":
-        return "Acceso completo al sistema de administración";
-      case "Abogado":
-        return "Acceso al área de trabajo y gestión de casos";
-      case "Cliente":
-        return "Acceso a tu perfil y seguimiento de casos";
-      default:
-        return "";
-    }
+    return "Ingresa con tu correo y contraseña";
   };
 
   return (
@@ -152,34 +128,6 @@ export function UnifiedLoginForm({
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="userType">Tipo de Usuario</Label>
-                <Select value={form.userType} onValueChange={handleUserTypeChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona tu tipo de usuario" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Cliente">
-                      <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4" />
-                        <span>Cliente</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="Abogado">
-                      <div className="flex items-center space-x-2">
-                        <Scale className="h-4 w-4" />
-                        <span>Abogado</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="Administrador">
-                      <div className="flex items-center space-x-2">
-                        <UserCheck className="h-4 w-4" />
-                        <span>Administrador</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
               <div className="grid gap-3">
                 <Label htmlFor="email">Correo</Label>
                 <Input
@@ -221,17 +169,15 @@ export function UnifiedLoginForm({
                 {loading ? "Ingresando..." : "Ingresar"}
               </Button>
               
-              {form.userType === "Cliente" && (
-                <div className="text-center text-sm">
-                  ¿No tienes una cuenta?{" "}
-                  <Link
-                    href="/auth/cliente/register"
-                    className="underline underline-offset-4"
-                  >
-                    Regístrate
-                  </Link>
-                </div>
-              )}
+              <div className="text-center text-sm">
+                ¿No tienes una cuenta?{" "}
+                <Link
+                  href="/auth/cliente/register"
+                  className="underline underline-offset-4"
+                >
+                  Regístrate
+                </Link>
+              </div>
 
               <div className="text-center">
                 <Link

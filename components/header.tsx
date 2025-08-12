@@ -21,14 +21,14 @@ export default function Header() {
   ];
 
   const { dashboardHref, dashboardLabel } = useMemo(() => {
-    if (user?.rol === "SuperAdmin" || user?.rol === "Administrador") {
+    if (user?.role === "SuperAdmin" || user?.role === "Administrador") {
       return { dashboardHref: "/dashboard", dashboardLabel: "Dashboard" };
-    } else if (user?.rol === "Abogado") {
+    } else if (user?.role === "Abogado") {
       return {
         dashboardHref: "/area-de-trabajo",
         dashboardLabel: "Área de Trabajo",
       };
-    } else if (user?.rol === "Cliente") {
+    } else if (user?.role === "Cliente") {
       return { dashboardHref: "/perfil", dashboardLabel: "Mi Perfil" };
     } else {
       return { dashboardHref: "/", dashboardLabel: "" };
